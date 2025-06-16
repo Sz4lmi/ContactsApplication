@@ -22,10 +22,17 @@ public class Contact {
 
     private String email;
 
+    @ManyToOne
+    @com.fasterxml.jackson.annotation.JsonBackReference
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     private List<PhoneNumber> phoneNumbers = new ArrayList<>();
 
     @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     private List<Address> addresses = new ArrayList<>();
 }
 

@@ -1,0 +1,2 @@
+ALTER TABLE contact
+    ADD COLUMN user_id BIGINT REFERENCES "user"(id) ON DELETE CASCADE;

@@ -1,6 +1,7 @@
 package contacts.controller;
 
 import contacts.domain.Contact;
+import contacts.dto.ContactRequestDTO;
 import contacts.service.ContactService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class ContactController {
     }
 
     @PostMapping
-    public Contact createContact(@RequestBody Contact contact) {
-        return contactService.saveContact(contact);
+    public Contact createContact(@RequestBody ContactRequestDTO dto) {
+        return contactService.saveContact(dto);
     }
 }

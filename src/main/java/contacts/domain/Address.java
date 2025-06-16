@@ -12,6 +12,7 @@ public class Address {
     private Long id;
 
     @ManyToOne
+    @com.fasterxml.jackson.annotation.JsonBackReference
     @JoinColumn(name = "contact_id")
     private Contact contact;
 

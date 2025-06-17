@@ -3,6 +3,7 @@ package contacts.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,16 @@ public class Contact {
 
     @Column(nullable = false)
     private String lastName;
+
+    private String motherName;
+
+    @Column(unique = true)
+    private String taxId;
+
+    @Column(unique = true)
+    private String tajNumber;
+
+    private LocalDate birthDate;
 
     private String email;
 

@@ -24,14 +24,18 @@ public class ContactService {
 
     public Contact saveContact(ContactRequestDTO dto) {
         Contact contact = new Contact();
-        contact.setFirstName(dto.firstName);
-        contact.setLastName(dto.lastName);
-        contact.setEmail(dto.email);
+        contact.setFirstName(dto.getFirstName());
+        contact.setLastName(dto.getLastName());
+        contact.setEmail(dto.getEmail());
+        contact.setTajNumber(dto.getTajNumber());
+        contact.setTaxId(dto.getTaxId());
+        contact.setMotherName(dto.getMotherName());
+        contact.setBirthDate(dto.getBirthDate());
         //contact.setUser(currentUser);
 
         // phone numbers
-        if (dto.phoneNumbers != null) {
-            for (String number : dto.phoneNumbers) {
+        if (dto.getPhoneNumbers() != null) {
+            for (String number : dto.getPhoneNumbers()) {
                 PhoneNumber phoneNumber = new PhoneNumber();
                 phoneNumber.setPhoneNumber(number);
                 phoneNumber.setContact(contact);
@@ -40,12 +44,12 @@ public class ContactService {
         }
 
         // addresses
-        if (dto.addresses != null) {
-            for (ContactRequestDTO.AddressDTO a : dto.addresses) {
+        if (dto.getAddresses() != null) {
+            for (ContactRequestDTO.AddressDTO a : dto.getAddresses()) {
                 Address address = new Address();
-                address.setStreet(a.street);
-                address.setCity(a.city);
-                address.setZipCode(a.zipCode);
+                address.setStreet(a.getStreet());
+                address.setCity(a.getCity());
+                address.setZipCode(a.getZipCode());
                 address.setContact(contact);
                 contact.getAddresses().add(address);
             }

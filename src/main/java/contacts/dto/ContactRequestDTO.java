@@ -1,17 +1,33 @@
 package contacts.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ContactRequestDTO {
-    public String firstName;
-    public String lastName;
-    public String email;
-    public List<String> phoneNumbers;
-    public List<AddressDTO> addresses;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private List<String> phoneNumbers;
+    private List<AddressDTO> addresses;
+    private String tajNumber;
+    private String taxId;
+    private String motherName;
+    private LocalDate birthDate; // vagy LocalDate, ha úgy szereted
 
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class AddressDTO {
-        public String street;
-        public String city;
-        public String zipCode;
+        private String street;
+        private String city;
+        private String zipCode;
     }
 }

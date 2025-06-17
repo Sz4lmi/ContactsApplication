@@ -13,6 +13,8 @@ public class ContactListDTO {
     private Long id;
     private String firstName;
     private String lastName;
+    private String email;
+    private List<PhoneNumberDTO> phoneNumbers;
     private List<AddressDTO> addresses;
 
     @Data
@@ -22,5 +24,12 @@ public class ContactListDTO {
         private String street;
         private String city;
         private String zipCode;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PhoneNumberDTO {
+        private String phoneNumber;
     }
 }

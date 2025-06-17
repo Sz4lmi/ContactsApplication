@@ -27,15 +27,22 @@
   background-color: #f9f9f9;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  cursor: pointer;
 }
 
 .contact-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-card.expanded {
+  background-color: #f0f7ff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  padding-bottom: 20px;
 }
 
 .contact-info {
@@ -50,6 +57,8 @@
   font-weight: 600;
 }
 
+.email-info p,
+.phone-info p,
 .address-info p {
   margin: 5px 0;
   color: #555;
@@ -61,6 +70,8 @@
   font-style: italic;
 }
 
+.no-email,
+.no-phone,
 .no-address {
   color: #999;
   font-style: italic;
@@ -320,4 +331,30 @@ button.delete-button:hover {
   color: #f44336;
   font-size: 14px;
   margin-top: 5px;
+}
+
+/* Styles for expanded contact details */
+.expanded-details {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 2px solid #4a90e2;
+}
+
+.additional-detail {
+  margin: 8px 0;
+  color: #555;
+}
+
+.expansion-indicator {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #4a90e2;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Make sure buttons don't trigger card expansion */
+.contact-actions button {
+  position: relative;
+  z-index: 10;
 }

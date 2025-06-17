@@ -67,7 +67,7 @@
         <button type="button" class="add-button" (click)="addAddress()">Add Address</button>
       </div>
       <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-fields">
-        <input formControlName="street" placeholder="Street" required>
+        <input formControlName="street" placeholder="Adress" required>
         <input formControlName="city" placeholder="City" required>
         <input formControlName="zipCode" placeholder="Zip Code" required>
         <button type="button" class="remove-button" (click)="removeAddress(i)">Remove</button>

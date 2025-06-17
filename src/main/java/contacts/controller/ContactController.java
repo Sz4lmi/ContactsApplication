@@ -89,8 +89,14 @@ public class ContactController {
             @PathVariable Long id,
             @RequestBody ContactRequestDTO dto,
             HttpServletRequest request) {
-        // Extract user ID from JWT token
+        // Extract user ID and role from JWT token
         Long userId = getUserIdFromToken(request);
+        String role = getRoleFromToken(request);
+
+        // Check if user is admin - admins cannot edit contacts
+        if (role != null && role.equals("ROLE_ADMIN")) {
+            return ResponseEntity.status(403).build(); // Forbidden
+        }
 
         // Update the contact
         Contact updatedContact = contactService.updateContact(id, dto, userId);
@@ -102,8 +108,14 @@ public class ContactController {
     public ResponseEntity<Void> deleteContact(
             @PathVariable Long id,
             HttpServletRequest request) {
-        // Extract user ID from JWT token
+        // Extract user ID and role from JWT token
         Long userId = getUserIdFromToken(request);
+        String role = getRoleFromToken(request);
+
+        // Check if user is admin - admins cannot delete contacts
+        if (role != null && role.equals("ROLE_ADMIN")) {
+            return ResponseEntity.status(403).build(); // Forbidden
+        }
 
         // Delete the contact
         contactService.deleteContact(id, userId);

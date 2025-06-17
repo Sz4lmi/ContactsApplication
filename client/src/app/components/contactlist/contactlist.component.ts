@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ContactserviceService } from '../../services/contactservice.service';
 import { ContactList } from '../../models/contactlist';
 import { Contactrequest, Address as AddressRequest } from '../../models/contactrequest';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-contactlist',
@@ -15,11 +16,17 @@ export class ContactlistComponent implements OnInit {
   showEditModal = false;
   editContactForm!: FormGroup;
   selectedContact: ContactList | null = null;
+  expandedContactIds: Set<number> = new Set<number>();
+
+  isAdmin = false;
 
   constructor(
     private contactService: ContactserviceService,
-    private fb: FormBuilder
-  ) {}
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
+    this.isAdmin = this.authService.isAdmin();
+  }
 
   ngOnInit(): void {
     this.loadContacts();
@@ -186,5 +193,22 @@ export class ContactlistComponent implements OnInit {
         }
       );
     }
+  }
+
+  toggleContactExpansion(contact: ContactList, event: MouseEvent): void {
+    // Prevent the click from triggering if it was on a button
+    if (event.target instanceof HTMLButtonElement) {
+      return;
+    }
+
+    if (this.expandedContactIds.has(contact.id)) {
+      this.expandedContactIds.delete(contact.id);
+    } else {
+      this.expandedContactIds.add(contact.id);
+    }
+  }
+
+  isContactExpanded(contactId: number): boolean {
+    return this.expandedContactIds.has(contactId);
   }
 }

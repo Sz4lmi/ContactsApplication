@@ -71,6 +71,18 @@ public class ContactService {
         dto.setId(contact.getId());
         dto.setFirstName(contact.getFirstName());
         dto.setLastName(contact.getLastName());
+        dto.setEmail(contact.getEmail());
+
+        // Convert phone numbers
+        List<ContactListDTO.PhoneNumberDTO> phoneNumberDTOs = contact.getPhoneNumbers().stream()
+                .map(phoneNumber -> {
+                    ContactListDTO.PhoneNumberDTO phoneNumberDTO = new ContactListDTO.PhoneNumberDTO();
+                    phoneNumberDTO.setPhoneNumber(phoneNumber.getPhoneNumber());
+                    return phoneNumberDTO;
+                })
+                .collect(Collectors.toList());
+
+        dto.setPhoneNumbers(phoneNumberDTOs);
 
         // Convert addresses
         List<ContactListDTO.AddressDTO> addressDTOs = contact.getAddresses().stream()

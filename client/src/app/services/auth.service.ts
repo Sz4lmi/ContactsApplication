@@ -54,6 +54,19 @@ export class AuthService {
     return localStorage.getItem(this.USER_ID_KEY);
   }
 
+  getUserRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    const decodedToken = this.parseJwt(token);
+    return decodedToken?.role || null;
+  }
+
+  isAdmin(): boolean {
+    const role = this.getUserRole();
+    return role === 'ROLE_ADMIN';
+  }
+
   private setToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
   }

@@ -31,9 +31,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody Map<String, String> credentials, HttpServletResponse response) {
+    public Map<String, Object> login(@RequestBody Map<String, String> credentials, HttpServletResponse response) {
         String username = credentials.get("username");
         String password = credentials.get("password");
+        System.out.println(new BCryptPasswordEncoder().encode("admin123"));
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -41,15 +42,18 @@ public class AuthController {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
+
         String jwt = Jwts.builder()
                 .setSubject(username)
                 .claim("role", user.getRole())
+                .claim("userId", user.getId())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 nap
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("token", jwt);
+        result.put("userId", user.getId());
         return result;
     }
 

@@ -3,8 +3,10 @@ package contacts.service;
 import contacts.domain.Address;
 import contacts.domain.Contact;
 import contacts.domain.PhoneNumber;
+import contacts.domain.User;
 import contacts.dto.ContactRequestDTO;
 import contacts.repository.ContactRepository;
+import contacts.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,16 +15,27 @@ import java.util.List;
 public class ContactService {
 
     private final ContactRepository contactRepository;
+    private final UserRepository userRepository;
 
-    public ContactService(ContactRepository contactRepository) {
+    public ContactService(ContactRepository contactRepository, UserRepository userRepository) {
         this.contactRepository = contactRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Contact> getAllContacts() {
         return contactRepository.findAll();
     }
 
-    public Contact saveContact(ContactRequestDTO dto) {
+    public List<Contact> getContactsByUserId(Long userId) {
+        // Find the user by ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Return the user's contacts
+        return user.getContacts();
+    }
+
+    public Contact saveContact(ContactRequestDTO dto, Long userId) {
         Contact contact = new Contact();
         contact.setFirstName(dto.getFirstName());
         contact.setLastName(dto.getLastName());
@@ -31,7 +44,13 @@ public class ContactService {
         contact.setTaxId(dto.getTaxId());
         contact.setMotherName(dto.getMotherName());
         contact.setBirthDate(dto.getBirthDate());
-        //contact.setUser(currentUser);
+
+        // Set the user if userId is provided
+        if (userId != null) {
+            User user = new User();
+            user.setId(userId);
+            contact.setUser(user);
+        }
 
         // phone numbers
         if (dto.getPhoneNumbers() != null) {

@@ -1,0 +1,88 @@
+<form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+  <!-- Personal Information Section -->
+  <div class="form-section">
+    <h3>Personal Information</h3>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="firstName">First Name</label>
+        <input id="firstName" formControlName="firstName" required>
+      </div>
+      <div class="form-field">
+        <label for="lastName">Last Name</label>
+        <input id="lastName" formControlName="lastName" required>
+      </div>
+    </div>
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input id="email" formControlName="email" type="email">
+    </div>
+    <div class="form-field">
+      <label for="birthDate">Birth Date</label>
+      <input id="birthDate" formControlName="birthDate" type="date" required>
+    </div>
+    <div class="form-field">
+      <label for="mothersName">Mother's Name</label>
+      <input id="mothersName" formControlName="mothersName" required>
+    </div>
+  </div>
+
+  <!-- Identification Section -->
+  <div class="form-section">
+    <h3>Identification</h3>
+    <div class="form-row">
+      <div class="form-field">
+        <label for="tajNumber">TAJ Number</label>
+        <input id="tajNumber" formControlName="tajNumber" required>
+      </div>
+      <div class="form-field">
+        <label for="taxId">Tax ID</label>
+        <input id="taxId" formControlName="taxId" required>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Information Section -->
+  <div class="form-section">
+    <h3>Contact Information</h3>
+
+    <!-- Phone Numbers -->
+    <div class="array-field" formArrayName="phoneNumbers">
+      <div class="array-field-header">
+        <h4>Phone Numbers</h4>
+        <button type="button" class="add-button" (click)="addPhoneNumber()">Add Phone Number</button>
+      </div>
+      <div class="array-item" *ngFor="let phone of phoneNumbers.controls; let i = index">
+        <input [formControlName]="i" placeholder="Phone Number" required>
+        <button type="button" class="remove-button" (click)="removePhoneNumber(i)">Remove</button>
+      </div>
+      <div *ngIf="phoneNumbers.controls.length === 0" class="array-item">
+        <p>No phone numbers added yet. Click "Add Phone Number" to add one.</p>
+      </div>
+    </div>
+
+    <!-- Addresses -->
+    <div class="array-field" formArrayName="addresses">
+      <div class="array-field-header">
+        <h4>Addresses</h4>
+        <button type="button" class="add-button" (click)="addAddress()">Add Address</button>
+      </div>
+      <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-fields">
+        <input formControlName="street" placeholder="Street" required>
+        <input formControlName="city" placeholder="City" required>
+        <input formControlName="zipCode" placeholder="Zip Code" required>
+        <button type="button" class="remove-button" (click)="removeAddress(i)">Remove</button>
+      </div>
+      <div *ngIf="addresses.controls.length === 0" class="array-item">
+        <p>No addresses added yet. Click "Add Address" to add one.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Error -->
+  <div *ngIf="contactForm.errors?.['emailOrPhone']" class="validation-error">
+    Please provide at least an email or one phone number.
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" [disabled]="contactForm.invalid">Submit Contact</button>
+</form>

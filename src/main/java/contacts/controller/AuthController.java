@@ -34,7 +34,7 @@ public class AuthController {
     public Map<String, Object> login(@RequestBody Map<String, String> credentials, HttpServletResponse response) {
         String username = credentials.get("username");
         String password = credentials.get("password");
-        System.out.println(new BCryptPasswordEncoder().encode("admin123"));
+
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));

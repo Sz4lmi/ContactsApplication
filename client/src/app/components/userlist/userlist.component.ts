@@ -15,6 +15,7 @@ export class UserlistComponent implements OnInit {
   editUserForm!: FormGroup;
   selectedUser: User | null = null;
   expandedUserIds: Set<number> = new Set<number>();
+  expandedContactIds: Set<number> = new Set<number>();
 
   constructor(
     private userService: UserService,
@@ -120,5 +121,25 @@ export class UserlistComponent implements OnInit {
 
   isUserExpanded(userId: number): boolean {
     return this.expandedUserIds.has(userId);
+  }
+
+  toggleContactExpansion(contactId: number, event: MouseEvent): void {
+    // Prevent the click from triggering if it was on a button
+    if (event.target instanceof HTMLButtonElement) {
+      return;
+    }
+
+    // Stop propagation to prevent triggering the user card expansion
+    event.stopPropagation();
+
+    if (this.expandedContactIds.has(contactId)) {
+      this.expandedContactIds.delete(contactId);
+    } else {
+      this.expandedContactIds.add(contactId);
+    }
+  }
+
+  isContactExpanded(contactId: number): boolean {
+    return this.expandedContactIds.has(contactId);
   }
 }

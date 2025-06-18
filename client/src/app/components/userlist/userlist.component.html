@@ -18,26 +18,63 @@
         <!-- User's contacts (shown when expanded) -->
         <div *ngIf="isUserExpanded(user.id) && user.contacts && user.contacts.length > 0" class="expanded-details">
           <h4>Contacts</h4>
-          <div *ngFor="let contact of user.contacts" class="contact-card">
-            <h5>{{ contact.firstName }} {{ contact.lastName }}</h5>
+          <div *ngFor="let contact of user.contacts" class="contact-card" [class.expanded]="isContactExpanded(contact.id)" (click)="toggleContactExpansion(contact.id, $event)">
+            <div class="contact-info">
+              <h5>{{ contact.firstName }} {{ contact.lastName }}</h5>
 
-            <!-- Email information -->
-            <div *ngIf="contact.email" class="email-info">
-              <p><strong>Email:</strong> {{ contact.email }}</p>
-            </div>
+              <!-- Email information -->
+              <div *ngIf="contact.email" class="email-info">
+                <p><strong>Email:</strong> {{ contact.email }}</p>
+              </div>
+              <div *ngIf="!contact.email" class="email-info">
+                <p class="no-email">No email information</p>
+              </div>
 
-            <!-- Phone numbers information -->
-            <div *ngIf="contact.phoneNumbers && contact.phoneNumbers.length > 0" class="phone-info">
-              <p *ngFor="let phone of contact.phoneNumbers">
-                <strong>Phone:</strong> {{ phone.phoneNumber }}
-              </p>
-            </div>
+              <!-- Phone numbers information -->
+              <div *ngIf="contact.phoneNumbers && contact.phoneNumbers.length > 0" class="phone-info">
+                <p><strong>Phone:</strong> {{ contact.phoneNumbers[0].phoneNumber }}</p>
 
-            <!-- Address information -->
-            <div *ngIf="contact.addresses && contact.addresses.length > 0" class="address-info">
-              <p *ngFor="let address of contact.addresses">
-                <strong>Address:</strong> {{ address.street }}, {{ address.zipCode }} {{ address.city }}
-              </p>
+                <!-- Additional phone numbers (shown when expanded) -->
+                <div *ngIf="isContactExpanded(contact.id) && contact.phoneNumbers.length > 1" class="expanded-details">
+                  <p *ngFor="let phone of contact.phoneNumbers.slice(1)" class="additional-detail">
+                    <strong>Phone:</strong> {{ phone.phoneNumber }}
+                  </p>
+                </div>
+
+                <!-- Indicator for collapsed state -->
+                <p *ngIf="!isContactExpanded(contact.id) && contact.phoneNumbers.length > 1" class="additional-info">
+                  +{{ contact.phoneNumbers.length - 1 }} more phone numbers
+                </p>
+              </div>
+              <div *ngIf="!contact.phoneNumbers || contact.phoneNumbers.length === 0" class="phone-info">
+                <p class="no-phone">No phone information</p>
+              </div>
+
+              <!-- Address information -->
+              <div *ngIf="contact.addresses && contact.addresses.length > 0" class="address-info">
+                <p><strong>Address:</strong> {{ contact.addresses[0].street }}, {{ contact.addresses[0].zipCode }} {{ contact.addresses[0].city }}</p>
+
+                <!-- Additional addresses (shown when expanded) -->
+                <div *ngIf="isContactExpanded(contact.id) && contact.addresses.length > 1" class="expanded-details">
+                  <p *ngFor="let address of contact.addresses.slice(1)" class="additional-detail">
+                    <strong>Address:</strong> {{ address.street }}, {{ address.zipCode }} {{ address.city }}
+                  </p>
+                </div>
+
+                <!-- Indicator for collapsed state -->
+                <p *ngIf="!isContactExpanded(contact.id) && contact.addresses.length > 1" class="additional-info">
+                  +{{ contact.addresses.length - 1 }} more addresses
+                </p>
+              </div>
+              <div *ngIf="!contact.addresses || contact.addresses.length === 0" class="address-info">
+                <p class="no-address">No address information</p>
+              </div>
+
+              <!-- Expansion indicator -->
+              <div class="expansion-indicator">
+                <span *ngIf="!isContactExpanded(contact.id)">Click to see all details</span>
+                <span *ngIf="isContactExpanded(contact.id)">Click to collapse</span>
+              </div>
             </div>
           </div>
         </div>

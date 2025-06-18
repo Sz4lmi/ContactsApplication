@@ -180,6 +180,7 @@ public class ContactService {
      * @param dto The contact data
      * @param userId The ID of the user who owns the contact
      * @return The saved contact
+     * @throws RuntimeException if the user is not found
      */
     public Contact saveContact(ContactRequestDTO dto, Long userId) {
         Contact contact = new Contact();
@@ -193,8 +194,9 @@ public class ContactService {
 
         // Set the user if userId is provided
         if (userId != null) {
-            User user = new User();
-            user.setId(userId);
+            // Load the user from the database to ensure it exists
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             contact.setUser(user);
         }
 

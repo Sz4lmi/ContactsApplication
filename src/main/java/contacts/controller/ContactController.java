@@ -4,6 +4,7 @@ import contacts.domain.Contact;
 import contacts.dto.ContactListDTO;
 import contacts.dto.ContactRequestDTO;
 import contacts.service.ContactService;
+import contacts.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
@@ -190,29 +191,9 @@ public class ContactController {
         logger.debug("ContactController.getUserIdFromToken: authHeader = {}", 
             (authHeader != null ? authHeader.substring(0, Math.min(20, authHeader.length())) + "..." : "null"));
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Remove "Bearer " prefix
-            logger.debug("ContactController.getUserIdFromToken: token = {}", 
-                (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
-
-            try {
-                Claims claims = Jwts.parser()
-                        .setSigningKey(SecurityConstants.SECRET_KEY)
-                        .parseClaimsJws(token)
-                        .getBody();
-
-                // Get userId from claims
-                Integer userId = claims.get("userId", Integer.class);
-                logger.debug("ContactController.getUserIdFromToken: extracted userId = {}", userId);
-                return userId != null ? userId.longValue() : null;
-            } catch (Exception e) {
-                // Token validation failed
-                logger.debug("ContactController.getUserIdFromToken: token validation failed: {}", e.getMessage());
-                return null;
-            }
-        }
-        logger.debug("ContactController.getUserIdFromToken: no valid auth header found");
-        return null;
+        Long userId = JwtUtils.getUserIdFromToken(request);
+        logger.debug("ContactController.getUserIdFromToken: extracted userId = {}", userId);
+        return userId;
     }
 
     /**
@@ -226,28 +207,8 @@ public class ContactController {
         logger.debug("ContactController.getRoleFromToken: authHeader = {}", 
             (authHeader != null ? authHeader.substring(0, Math.min(20, authHeader.length())) + "..." : "null"));
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Remove "Bearer " prefix
-            logger.debug("ContactController.getRoleFromToken: token = {}", 
-                (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
-
-            try {
-                Claims claims = Jwts.parser()
-                        .setSigningKey(SecurityConstants.SECRET_KEY)
-                        .parseClaimsJws(token)
-                        .getBody();
-
-                // Get role from claims
-                String role = claims.get("role", String.class);
-                logger.debug("ContactController.getRoleFromToken: extracted role = {}", role);
-                return role;
-            } catch (Exception e) {
-                // Token validation failed
-                logger.debug("ContactController.getRoleFromToken: token validation failed: {}", e.getMessage());
-                return null;
-            }
-        }
-        logger.debug("ContactController.getRoleFromToken: no valid auth header found");
-        return null;
+        String role = JwtUtils.getRoleFromToken(request);
+        logger.debug("ContactController.getRoleFromToken: extracted role = {}", role);
+        return role;
     }
 }

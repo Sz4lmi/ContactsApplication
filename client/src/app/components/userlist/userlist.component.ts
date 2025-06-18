@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService, User, UserDTO } from '../../services/user.service';
 import { ContactserviceService } from '../../services/contactservice.service';
+import { LoggingService } from '../../services/logging.service';
 
 @Component({
   selector: 'app-userlist',
@@ -20,7 +21,8 @@ export class UserlistComponent implements OnInit {
   constructor(
     private userService: UserService,
     private contactService: ContactserviceService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private logger: LoggingService
   ) {}
 
   ngOnInit(): void {
@@ -28,18 +30,24 @@ export class UserlistComponent implements OnInit {
     this.initForm();
   }
 
+  /**
+   * Load all users from the server
+   */
   loadUsers(): void {
     this.userService.getAllUsers().subscribe(
       (data) => {
         this.users = data;
-        console.log('UserlistComponent: loaded users =', data);
+        this.logger.debug('UserlistComponent: loaded users =', data);
       },
       (error) => {
-        console.error('Error fetching users:', error);
+        this.logger.error('Error fetching users:', error);
       }
     );
   }
 
+  /**
+   * Initialize the form for editing users
+   */
   initForm(): void {
     this.editUserForm = this.fb.group({
       username: ['', Validators.required],

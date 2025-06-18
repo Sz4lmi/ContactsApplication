@@ -5,7 +5,7 @@ import contacts.domain.User;
 import contacts.dto.UserDTO;
 import contacts.repository.UserRepository;
 import contacts.service.UserService;
-import io.jsonwebtoken.Claims;
+import contacts.util.JwtUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,32 +38,43 @@ public class AuthController {
         this.userService = userService;
     }
 
+    /**
+     * Authenticate a user and generate a JWT token.
+     *
+     * @param credentials Map containing username and password
+     * @param response HTTP response
+     * @return Map containing token, userId, and role
+     */
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody Map<String, String> credentials, HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials, HttpServletResponse response) {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
+        try {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                throw new RuntimeException("Invalid credentials");
+            }
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            String jwt = Jwts.builder()
+                    .setSubject(username)
+                    .claim("role", user.getRole())
+                    .claim("userId", user.getId())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
+                    .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                    .compact();
+            Map<String, Object> result = new HashMap<>();
+            result.put("token", jwt);
+            result.put("userId", user.getId());
+            result.put("role", user.getRole());
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            // Let the global exception handler handle this
+            throw e;
         }
-
-        String jwt = Jwts.builder()
-                .setSubject(username)
-                .claim("role", user.getRole())
-                .claim("userId", user.getId())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
-        Map<String, Object> result = new HashMap<>();
-        result.put("token", jwt);
-        result.put("userId", user.getId());
-        result.put("role", user.getRole());
-        return result;
     }
 
     /**
@@ -94,23 +105,7 @@ public class AuthController {
      * @return Role or null if not found
      */
     private String getRoleFromToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // Remove "Bearer " prefix
-            try {
-                Claims claims = Jwts.parser()
-                        .setSigningKey(SecurityConstants.SECRET_KEY)
-                        .parseClaimsJws(token)
-                        .getBody();
-
-                // Get role from claims
-                return claims.get("role", String.class);
-            } catch (Exception e) {
-                // Token validation failed
-                return null;
-            }
-        }
-        return null;
+        return JwtUtils.getRoleFromToken(request);
     }
 
     /**

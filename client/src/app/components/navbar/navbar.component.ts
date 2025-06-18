@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 export class NavbarComponent implements OnInit {
   isAuthenticated = false;
   isAdmin = false;
+  username: string | null = null;
 
   constructor(private authService: AuthService) {}
 
@@ -20,6 +21,12 @@ export class NavbarComponent implements OnInit {
         this.isAuthenticated = isAuthenticated;
         // Check if user is admin
         this.isAdmin = this.authService.isAdmin();
+        // Get username if authenticated
+        if (isAuthenticated) {
+          this.username = this.authService.getUsername();
+        } else {
+          this.username = null;
+        }
       }
     );
   }

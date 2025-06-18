@@ -82,3 +82,29 @@ nav.navbar {
     display: inline-block;
   }
 }
+
+/* Right-aligned user navigation */
+.navbar-collapse {
+  display: flex;
+  justify-content: space-between;
+}
+
+.user-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+/* Username display styling */
+.username-display {
+  font-weight: 600;
+  color: #4a90e2 !important;
+  cursor: default;
+  display: inline-block;
+  padding: 8px 16px !important;
+}
+
+/* Logout link styling */
+.logout-link {
+  margin-left: 5px;
+}

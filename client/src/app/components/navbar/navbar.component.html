@@ -5,7 +5,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav mr-auto">
         <!-- Show these links only when authenticated -->
         <ng-container *ngIf="isAuthenticated">
           <!-- Regular user sees "My Contact Information" -->
@@ -29,7 +29,7 @@
       </ul>
 
       <!-- Authentication links on the right -->
-      <ul class="navbar-nav ml-auto">
+      <ul class="navbar-nav user-nav">
         <ng-container *ngIf="!isAuthenticated">
           <li class="nav-item">
             <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
@@ -37,7 +37,10 @@
         </ng-container>
         <ng-container *ngIf="isAuthenticated">
           <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)" (click)="logout()">Logout</a>
+            <span class="nav-link username-display">{{ username }}</span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link logout-link" href="javascript:void(0)" (click)="logout()">Logout</a>
           </li>
         </ng-container>
       </ul>

@@ -67,6 +67,14 @@ export class AuthService {
     return decodedToken?.role || null;
   }
 
+  getUsername(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    const decodedToken = this.parseJwt(token);
+    return decodedToken?.sub || null;
+  }
+
   isAdmin(): boolean {
     const role = this.getUserRole();
     const isAdmin = role === 'ROLE_ADMIN';

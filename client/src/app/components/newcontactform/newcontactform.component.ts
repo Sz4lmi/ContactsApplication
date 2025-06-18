@@ -9,7 +9,7 @@ import {
   ValidationErrors,
   ReactiveFormsModule
 } from '@angular/forms';
-import { ContactserviceService } from '../../services/contactservice.service';
+import { ContactService } from '../../services/contact.service';
 import { Contactrequest, Address } from '../../models/contactrequest';
 import {Router} from '@angular/router';
 
@@ -28,7 +28,7 @@ export class NewcontactformComponent {
 
   constructor(
     private fb: FormBuilder,
-    private contactService: ContactserviceService,
+    private contactService: ContactService,
     private router: Router
   ) {
     this.contactForm = this.fb.group({

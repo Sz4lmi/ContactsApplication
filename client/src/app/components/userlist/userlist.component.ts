@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService, User, UserDTO } from '../../services/user.service';
-import { ContactserviceService } from '../../services/contactservice.service';
+import { ContactService } from '../../services/contact.service';
 import { LoggingService } from '../../services/logging.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class UserlistComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private contactService: ContactserviceService,
+    private contactService: ContactService,
     private fb: FormBuilder,
     private logger: LoggingService
   ) {}

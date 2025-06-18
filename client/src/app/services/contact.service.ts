@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ContactserviceService {
+export class ContactService {
   private apiUrl = 'http://localhost:8080/api/contacts';
 
   constructor(

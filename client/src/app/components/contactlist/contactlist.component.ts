@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { ContactserviceService } from '../../services/contactservice.service';
+import { ContactService } from '../../services/contact.service';
 import { ContactList } from '../../models/contactlist';
 import { Contactrequest, Address as AddressRequest } from '../../models/contactrequest';
 import { AuthService } from '../../services/auth.service';
@@ -21,7 +21,7 @@ export class ContactlistComponent implements OnInit {
   isAdmin = false;
 
   constructor(
-    private contactService: ContactserviceService,
+    private contactService: ContactService,
     private fb: FormBuilder,
     private authService: AuthService
   ) {

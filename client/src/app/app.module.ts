@@ -10,6 +10,7 @@ import { ContactlistComponent } from './components/contactlist/contactlist.compo
 import { NewcontactformComponent } from './components/newcontactform/newcontactform.component';
 import { NewuserformComponent } from './components/newuserform/newuserform.component';
 import { LoginComponent } from './components/login/login.component';
+import { UserlistComponent } from './components/userlist/userlist.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
@@ -18,6 +19,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     NavbarComponent,
     ContactlistComponent,
     LoginComponent,
+    UserlistComponent,
   ],
   imports: [
     BrowserModule,

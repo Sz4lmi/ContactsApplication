@@ -12,9 +12,9 @@
           <li class="nav-item" *ngIf="!isAdmin">
             <a class="nav-link" routerLink="/contacts" routerLinkActive="active">My Contact Information</a>
           </li>
-          <!-- Admin sees "All Contacts" -->
+          <!-- Admin sees "All Users" -->
           <li class="nav-item" *ngIf="isAdmin">
-            <a class="nav-link" routerLink="/contacts" routerLinkActive="active">All Contacts</a>
+            <a class="nav-link" routerLink="/users" routerLinkActive="active">All Users</a>
           </li>
 
           <!-- Regular user sees "New Contact" -->

@@ -1,0 +1,95 @@
+<div class="user-list-container">
+  <h2>All Users</h2>
+
+  <!-- List of user cards -->
+  <div class="user-list">
+    <div *ngFor="let user of users" class="user-card" [class.expanded]="isUserExpanded(user.id)" (click)="toggleUserExpansion(user, $event)">
+      <div class="user-info">
+        <h3>{{ user.username }}</h3>
+        <p><strong>Role:</strong> {{ user.role === 'ROLE_ADMIN' ? 'Admin' : 'User' }}</p>
+        <p><strong>Contacts:</strong> {{ user.contacts?.length || 0 }}</p>
+
+        <!-- Expansion indicator -->
+        <div class="expansion-indicator">
+          <span *ngIf="!isUserExpanded(user.id)">Click to see all contacts</span>
+          <span *ngIf="isUserExpanded(user.id)">Click to collapse</span>
+        </div>
+
+        <!-- User's contacts (shown when expanded) -->
+        <div *ngIf="isUserExpanded(user.id) && user.contacts && user.contacts.length > 0" class="expanded-details">
+          <h4>Contacts</h4>
+          <div *ngFor="let contact of user.contacts" class="contact-card">
+            <h5>{{ contact.firstName }} {{ contact.lastName }}</h5>
+
+            <!-- Email information -->
+            <div *ngIf="contact.email" class="email-info">
+              <p><strong>Email:</strong> {{ contact.email }}</p>
+            </div>
+
+            <!-- Phone numbers information -->
+            <div *ngIf="contact.phoneNumbers && contact.phoneNumbers.length > 0" class="phone-info">
+              <p *ngFor="let phone of contact.phoneNumbers">
+                <strong>Phone:</strong> {{ phone.phoneNumber }}
+              </p>
+            </div>
+
+            <!-- Address information -->
+            <div *ngIf="contact.addresses && contact.addresses.length > 0" class="address-info">
+              <p *ngFor="let address of contact.addresses">
+                <strong>Address:</strong> {{ address.street }}, {{ address.zipCode }} {{ address.city }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="isUserExpanded(user.id) && (!user.contacts || user.contacts.length === 0)" class="expanded-details">
+          <p>No contacts found for this user.</p>
+        </div>
+      </div>
+      <div class="user-actions">
+        <button class="edit-button" (click)="openEditModal(user)">Edit</button>
+        <button class="delete-button" (click)="deleteUser(user)">Delete</button>
+      </div>
+    </div>
+
+    <div *ngIf="users.length === 0" class="no-users">
+      <p>No users found.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div *ngIf="showEditModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit User</h2>
+      <button type="button" class="close-button" (click)="closeEditModal()">×</button>
+    </div>
+
+    <form [formGroup]="editUserForm" (ngSubmit)="updateUser()">
+      <div class="form-field">
+        <label for="username">Username</label>
+        <input id="username" formControlName="username" required>
+      </div>
+
+      <div class="form-field">
+        <label for="oldPassword">Old Password</label>
+        <input id="oldPassword" formControlName="oldPassword" type="password">
+        <small *ngIf="editUserForm.value.username !== selectedUser?.username || editUserForm.value.newPassword">
+          * Required when changing username or password
+        </small>
+      </div>
+
+      <div class="form-field">
+        <label for="newPassword">New Password</label>
+        <input id="newPassword" formControlName="newPassword" type="password">
+      </div>
+
+      <!-- Submit Button -->
+      <div class="modal-footer">
+        <button type="button" class="cancel-button" (click)="closeEditModal()">Cancel</button>
+        <button type="submit" [disabled]="editUserForm.invalid">Update User</button>
+      </div>
+    </form>
+  </div>
+</div>

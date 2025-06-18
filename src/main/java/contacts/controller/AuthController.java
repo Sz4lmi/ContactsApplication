@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -110,5 +111,67 @@ public class AuthController {
             }
         }
         return null;
+    }
+
+    /**
+     * Get all users (admin only)
+     * @param request HTTP request
+     * @return List of all users
+     */
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
+        // Check if the current user is an admin
+        String role = getRoleFromToken(request);
+        if (role == null || !role.equals("ROLE_ADMIN")) {
+            return ResponseEntity.status(403).body("Only admins can view all users");
+        }
+
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Update a user (admin only)
+     * @param id User ID
+     * @param userDTO User data
+     * @param request HTTP request
+     * @return Updated user
+     */
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO, HttpServletRequest request) {
+        // Check if the current user is an admin
+        String role = getRoleFromToken(request);
+        if (role == null || !role.equals("ROLE_ADMIN")) {
+            return ResponseEntity.status(403).body("Only admins can update users");
+        }
+
+        try {
+            User updatedUser = userService.updateUser(id, userDTO);
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * Delete a user (admin only)
+     * @param id User ID
+     * @param request HTTP request
+     * @return Success message
+     */
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
+        // Check if the current user is an admin
+        String role = getRoleFromToken(request);
+        if (role == null || !role.equals("ROLE_ADMIN")) {
+            return ResponseEntity.status(403).body("Only admins can delete users");
+        }
+
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok("User deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

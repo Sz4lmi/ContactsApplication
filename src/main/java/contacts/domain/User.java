@@ -24,7 +24,7 @@ public class User {
     @Column(nullable = false)
     private String role; // ROLE_USER, ROLE_ADMIN
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @com.fasterxml.jackson.annotation.JsonManagedReference
     private List<Contact> contacts = new ArrayList<>();
 

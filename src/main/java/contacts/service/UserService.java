@@ -62,7 +62,7 @@ public class UserService {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        
+
         // Set role, default to ROLE_USER if not specified
         String role = userDTO.getRole();
         if (role == null || role.isEmpty()) {
@@ -83,8 +83,21 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Check if username or password is being changed and verify old password
+        boolean isChangingUsername = userDTO.getUsername() != null && !userDTO.getUsername().isEmpty() && !userDTO.getUsername().equals(user.getUsername());
+        boolean isChangingPassword = userDTO.getPassword() != null && !userDTO.getPassword().isEmpty();
+
+        if ((isChangingUsername || isChangingPassword) && userDTO.getOldPassword() != null) {
+            // Verify old password
+            if (!passwordEncoder.matches(userDTO.getOldPassword(), user.getPassword())) {
+                throw new RuntimeException("Old password is incorrect");
+            }
+        } else if ((isChangingUsername || isChangingPassword) && (userDTO.getOldPassword() == null || userDTO.getOldPassword().isEmpty())) {
+            throw new RuntimeException("Old password is required when changing username or password");
+        }
+
         // Update username if provided and not already taken by another user
-        if (userDTO.getUsername() != null && !userDTO.getUsername().isEmpty()) {
+        if (isChangingUsername) {
             Optional<User> existingUser = userRepository.findByUsername(userDTO.getUsername());
             if (existingUser.isPresent() && !existingUser.get().getId().equals(id)) {
                 throw new RuntimeException("Username already exists");
@@ -93,7 +106,7 @@ public class UserService {
         }
 
         // Update password if provided
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+        if (isChangingPassword) {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
 

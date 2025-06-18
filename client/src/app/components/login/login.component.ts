@@ -28,7 +28,12 @@ export class LoginComponent implements OnInit {
 
     // Redirect if already logged in
     if (this.authService.getToken()) {
-      this.router.navigate(['/contacts']);
+      // Redirect to users page if admin, otherwise to contacts
+      if (this.authService.isAdmin()) {
+        this.router.navigate(['/users']);
+      } else {
+        this.router.navigate(['/contacts']);
+      }
     }
   }
 
@@ -45,7 +50,12 @@ export class LoginComponent implements OnInit {
     this.authService.login(username, password).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/contacts']);
+        // Redirect to users page if admin, otherwise to contacts
+        if (this.authService.isAdmin()) {
+          this.router.navigate(['/users']);
+        } else {
+          this.router.navigate(['/contacts']);
+        }
       },
       error: (error) => {
         this.isLoading = false;

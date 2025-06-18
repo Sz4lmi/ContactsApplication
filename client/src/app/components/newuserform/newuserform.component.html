@@ -1,0 +1,71 @@
+<!-- Success message -->
+<div *ngIf="successMessage" class="alert alert-success">
+  {{ successMessage }}
+</div>
+
+<!-- Error message -->
+<div *ngIf="errorMessage" class="alert alert-danger">
+  {{ errorMessage }}
+</div>
+
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+  <!-- User Information Section -->
+  <div class="form-section">
+    <h3>User Information</h3>
+
+    <!-- Username -->
+    <div class="form-field">
+      <label for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        formControlName="username"
+        required
+      />
+      <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="validation-error">
+        <div *ngIf="userForm.get('username')?.errors?.['required']">Username is required</div>
+        <div *ngIf="userForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</div>
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="form-field">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        required
+      />
+      <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="validation-error">
+        <div *ngIf="userForm.get('password')?.errors?.['required']">Password is required</div>
+        <div *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+      </div>
+    </div>
+
+    <!-- Role -->
+    <div class="form-field">
+      <label for="role">Role</label>
+      <select
+        id="role"
+        formControlName="role"
+        required
+      >
+        <option value="ROLE_USER">Regular User</option>
+        <option value="ROLE_ADMIN">Admin</option>
+      </select>
+      <div *ngIf="userForm.get('role')?.invalid && userForm.get('role')?.touched" class="validation-error">
+        <div *ngIf="userForm.get('role')?.errors?.['required']">Role is required</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <button
+    type="submit"
+    [disabled]="userForm.invalid || isSubmitting"
+  >
+    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm mr-1"></span>
+    Create User
+  </button>
+</form>

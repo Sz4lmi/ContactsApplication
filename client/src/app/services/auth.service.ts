@@ -3,10 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { LoggingService } from './logging.service';
 
 interface LoginResponse {
   token: string;
   userId: number;
+  role: string;
 }
 
 @Injectable({
@@ -29,6 +31,7 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { username, password })
       .pipe(
         tap(response => {
+          console.log('AuthService: login response =', response);
           this.setToken(response.token);
 
           // Store user ID from response
@@ -59,12 +62,16 @@ export class AuthService {
     if (!token) return null;
 
     const decodedToken = this.parseJwt(token);
+    console.log('AuthService: token =', token);
+    console.log('AuthService: decodedToken =', decodedToken);
     return decodedToken?.role || null;
   }
 
   isAdmin(): boolean {
     const role = this.getUserRole();
-    return role === 'ROLE_ADMIN';
+    const isAdmin = role === 'ROLE_ADMIN';
+    console.log('AuthService: isAdmin check - role =', role, ', isAdmin =', isAdmin);
+    return isAdmin;
   }
 
   private setToken(token: string): void {

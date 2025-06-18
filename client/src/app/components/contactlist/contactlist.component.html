@@ -62,8 +62,8 @@
         </div>
       </div>
       <div class="contact-actions">
-        <button *ngIf="!isAdmin" class="edit-button" (click)="openEditModal(contact)">Edit</button>
-        <button *ngIf="!isAdmin" class="delete-button" (click)="deleteContact(contact)">Delete</button>
+        <button class="edit-button" (click)="openEditModal(contact)">Edit</button>
+        <button class="delete-button" (click)="deleteContact(contact)">Delete</button>
       </div>
     </div>
 

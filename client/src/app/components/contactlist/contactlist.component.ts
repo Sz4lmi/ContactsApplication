@@ -26,6 +26,8 @@ export class ContactlistComponent implements OnInit {
     private authService: AuthService
   ) {
     this.isAdmin = this.authService.isAdmin();
+    console.log('ContactlistComponent: isAdmin =', this.isAdmin);
+    console.log('ContactlistComponent: userRole =', this.authService.getUserRole());
   }
 
   ngOnInit(): void {
@@ -37,6 +39,8 @@ export class ContactlistComponent implements OnInit {
     this.contactService.getContactList().subscribe(
       (data) => {
         this.contacts = data;
+        console.log('ContactlistComponent: loaded contacts =', data);
+        console.log('ContactlistComponent: contacts length =', data.length);
       },
       (error) => {
         console.error('Error fetching contacts:', error);

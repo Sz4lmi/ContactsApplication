@@ -6,6 +6,8 @@ import contacts.dto.ContactRequestDTO;
 import contacts.service.ContactService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,16 +16,34 @@ import java.util.List;
 
 import contacts.config.SecurityConstants;
 
+/**
+ * REST controller for managing contacts.
+ * Provides endpoints for CRUD operations on contacts.
+ */
 @RestController
 @RequestMapping("/api/contacts")
 public class ContactController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContactController.class);
     private final ContactService contactService;
 
+    /**
+     * Constructor for ContactController.
+     *
+     * @param contactService The service for contact operations
+     */
     public ContactController(ContactService contactService) {
         this.contactService = contactService;
     }
 
+    /**
+     * Get a contact by its ID.
+     * Only returns the contact if the user has permission to view it.
+     *
+     * @param id The ID of the contact to retrieve
+     * @param request The HTTP request containing authentication information
+     * @return The contact or 404 if not found or not accessible
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Contact> getContactById(@PathVariable Long id, HttpServletRequest request) {
         // Extract user ID from JWT token
@@ -43,6 +63,14 @@ public class ContactController {
         return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Get all contacts accessible to the user.
+     * If user ID is available, returns only contacts for that user.
+     * Otherwise, returns all contacts.
+     *
+     * @param request The HTTP request containing authentication information
+     * @return List of contacts
+     */
     @GetMapping
     public List<Contact> getAllContacts(HttpServletRequest request) {
         // Extract user ID from JWT token
@@ -57,26 +85,47 @@ public class ContactController {
         return contactService.getAllContacts();
     }
 
+    /**
+     * Get a list of contacts based on user role and ID.
+     * Admin users can see all contacts, regular users see only their contacts.
+     *
+     * @param request The HTTP request containing authentication information
+     * @return List of contacts as DTOs
+     */
     @GetMapping("/list")
     public List<ContactListDTO> getContactList(HttpServletRequest request) {
         // Extract user ID and role from JWT token
         Long userId = getUserIdFromToken(request);
         String role = getRoleFromToken(request);
 
+        logger.debug("ContactController.getContactList: userId = {}, role = {}", userId, role);
+
         // If user is admin, return all contacts
         if (role != null && role.equals("ROLE_ADMIN")) {
-            return contactService.getAllContactsAsList();
+            List<ContactListDTO> allContacts = contactService.getAllContactsAsList();
+            logger.debug("ContactController.getContactList: returning all contacts, count = {}", allContacts.size());
+            return allContacts;
         }
 
         // If we have a userId, get contacts for that user
         if (userId != null) {
-            return contactService.getContactListByUserId(userId);
+            List<ContactListDTO> userContacts = contactService.getContactListByUserId(userId);
+            logger.debug("ContactController.getContactList: returning user contacts, count = {}", userContacts.size());
+            return userContacts;
         }
 
         // Otherwise, return an empty list
+        logger.debug("ContactController.getContactList: returning empty list");
         return List.of();
     }
 
+    /**
+     * Create a new contact for the authenticated user.
+     *
+     * @param dto The contact data
+     * @param request The HTTP request containing authentication information
+     * @return The created contact
+     */
     @PostMapping
     public Contact createContact(@RequestBody ContactRequestDTO dto, HttpServletRequest request) {
         // Extract user ID from JWT token
@@ -84,6 +133,15 @@ public class ContactController {
         return contactService.saveContact(dto, userId);
     }
 
+    /**
+     * Update an existing contact.
+     * Both regular users and admins can update contacts.
+     *
+     * @param id The ID of the contact to update
+     * @param dto The updated contact data
+     * @param request The HTTP request containing authentication information
+     * @return The updated contact or appropriate error response
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Contact> updateContact(
             @PathVariable Long id,
@@ -93,17 +151,20 @@ public class ContactController {
         Long userId = getUserIdFromToken(request);
         String role = getRoleFromToken(request);
 
-        // Check if user is admin - admins cannot edit contacts
-        if (role != null && role.equals("ROLE_ADMIN")) {
-            return ResponseEntity.status(403).build(); // Forbidden
-        }
-
         // Update the contact
         Contact updatedContact = contactService.updateContact(id, dto, userId);
 
         return ResponseEntity.ok(updatedContact);
     }
 
+    /**
+     * Delete a contact.
+     * Both regular users and admins can delete contacts.
+     *
+     * @param id The ID of the contact to delete
+     * @param request The HTTP request containing authentication information
+     * @return 204 No Content on success, or appropriate error response
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteContact(
             @PathVariable Long id,
@@ -112,21 +173,28 @@ public class ContactController {
         Long userId = getUserIdFromToken(request);
         String role = getRoleFromToken(request);
 
-        // Check if user is admin - admins cannot delete contacts
-        if (role != null && role.equals("ROLE_ADMIN")) {
-            return ResponseEntity.status(403).build(); // Forbidden
-        }
-
         // Delete the contact
         contactService.deleteContact(id, userId);
 
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Extracts the user ID from the JWT token in the request.
+     *
+     * @param request The HTTP request containing the JWT token
+     * @return The user ID or null if not found or token is invalid
+     */
     private Long getUserIdFromToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
+        logger.debug("ContactController.getUserIdFromToken: authHeader = {}", 
+            (authHeader != null ? authHeader.substring(0, Math.min(20, authHeader.length())) + "..." : "null"));
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7); // Remove "Bearer " prefix
+            logger.debug("ContactController.getUserIdFromToken: token = {}", 
+                (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
+
             try {
                 Claims claims = Jwts.parser()
                         .setSigningKey(SecurityConstants.SECRET_KEY)
@@ -135,19 +203,34 @@ public class ContactController {
 
                 // Get userId from claims
                 Integer userId = claims.get("userId", Integer.class);
+                logger.debug("ContactController.getUserIdFromToken: extracted userId = {}", userId);
                 return userId != null ? userId.longValue() : null;
             } catch (Exception e) {
                 // Token validation failed
+                logger.debug("ContactController.getUserIdFromToken: token validation failed: {}", e.getMessage());
                 return null;
             }
         }
+        logger.debug("ContactController.getUserIdFromToken: no valid auth header found");
         return null;
     }
 
+    /**
+     * Extracts the user role from the JWT token in the request.
+     *
+     * @param request The HTTP request containing the JWT token
+     * @return The user role or null if not found or token is invalid
+     */
     private String getRoleFromToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
+        logger.debug("ContactController.getRoleFromToken: authHeader = {}", 
+            (authHeader != null ? authHeader.substring(0, Math.min(20, authHeader.length())) + "..." : "null"));
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7); // Remove "Bearer " prefix
+            logger.debug("ContactController.getRoleFromToken: token = {}", 
+                (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
+
             try {
                 Claims claims = Jwts.parser()
                         .setSigningKey(SecurityConstants.SECRET_KEY)
@@ -155,12 +238,16 @@ public class ContactController {
                         .getBody();
 
                 // Get role from claims
-                return claims.get("role", String.class);
+                String role = claims.get("role", String.class);
+                logger.debug("ContactController.getRoleFromToken: extracted role = {}", role);
+                return role;
             } catch (Exception e) {
                 // Token validation failed
+                logger.debug("ContactController.getRoleFromToken: token validation failed: {}", e.getMessage());
                 return null;
             }
         }
+        logger.debug("ContactController.getRoleFromToken: no valid auth header found");
         return null;
     }
 }

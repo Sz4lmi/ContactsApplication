@@ -42,7 +42,14 @@ export class ContactserviceService {
 
   // Get contact list for the current user or all contacts for admin
   getContactList(): Observable<ContactList[]> {
-    return this.http.get<ContactList[]>(`${this.apiUrl}/list`);
+    console.log('ContactService: getContactList - isAdmin =', this.authService.isAdmin());
+    return this.http.get<ContactList[]>(`${this.apiUrl}/list`).pipe(
+      map(contacts => {
+        console.log('ContactService: getContactList response =', contacts);
+        console.log('ContactService: getContactList response length =', contacts.length);
+        return contacts;
+      })
+    );
   }
 
   // Create a new contact

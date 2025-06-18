@@ -2,11 +2,16 @@ package contacts.controller;
 
 import contacts.config.SecurityConstants;
 import contacts.domain.User;
+import contacts.dto.UserDTO;
 import contacts.repository.UserRepository;
+import contacts.service.UserService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +26,15 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     private final SecretKey SECRET_KEY = SecurityConstants.SECRET_KEY;
 
     @Autowired
-    public AuthController(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public AuthController(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, UserService userService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -54,7 +61,54 @@ public class AuthController {
         Map<String, Object> result = new HashMap<>();
         result.put("token", jwt);
         result.put("userId", user.getId());
+        result.put("role", user.getRole());
         return result;
     }
 
+    /**
+     * Create a new user (admin only)
+     * @param userDTO User data
+     * @param request HTTP request
+     * @return Created user
+     */
+    @PostMapping("/users")
+    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO, HttpServletRequest request) {
+        // Check if the current user is an admin
+        String role = getRoleFromToken(request);
+        if (role == null || !role.equals("ROLE_ADMIN")) {
+            return ResponseEntity.status(403).body("Only admins can create users");
+        }
+
+        try {
+            User createdUser = userService.createUser(userDTO);
+            return ResponseEntity.ok(createdUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    /**
+     * Extract role from JWT token
+     * @param request HTTP request
+     * @return Role or null if not found
+     */
+    private String getRoleFromToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7); // Remove "Bearer " prefix
+            try {
+                Claims claims = Jwts.parser()
+                        .setSigningKey(SecurityConstants.SECRET_KEY)
+                        .parseClaimsJws(token)
+                        .getBody();
+
+                // Get role from claims
+                return claims.get("role", String.class);
+            } catch (Exception e) {
+                // Token validation failed
+                return null;
+            }
+        }
+        return null;
+    }
 }

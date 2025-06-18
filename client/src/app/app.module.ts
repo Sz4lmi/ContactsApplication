@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { NewcontactformComponent } from './components/newcontactform/newcontactform.component';
+import { NewuserformComponent } from './components/newuserform/newuserform.component';
 import { LoginComponent } from './components/login/login.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
@@ -23,7 +24,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    NewcontactformComponent
+    NewcontactformComponent,
+    NewuserformComponent
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

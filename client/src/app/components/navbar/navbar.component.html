@@ -8,11 +8,22 @@
       <ul class="navbar-nav">
         <!-- Show these links only when authenticated -->
         <ng-container *ngIf="isAuthenticated">
-          <li class="nav-item">
+          <!-- Regular user sees "My Contact Information" -->
+          <li class="nav-item" *ngIf="!isAdmin">
             <a class="nav-link" routerLink="/contacts" routerLinkActive="active">My Contact Information</a>
           </li>
-          <li class="nav-item">
+          <!-- Admin sees "All Contacts" -->
+          <li class="nav-item" *ngIf="isAdmin">
+            <a class="nav-link" routerLink="/contacts" routerLinkActive="active">All Contacts</a>
+          </li>
+
+          <!-- Regular user sees "New Contact" -->
+          <li class="nav-item" *ngIf="!isAdmin">
             <a class="nav-link" routerLink="/new-contact" routerLinkActive="active">New Contact</a>
+          </li>
+          <!-- Admin sees "Add New User" -->
+          <li class="nav-item" *ngIf="isAdmin">
+            <a class="nav-link" routerLink="/new-user" routerLinkActive="active">Add New User</a>
           </li>
         </ng-container>
       </ul>

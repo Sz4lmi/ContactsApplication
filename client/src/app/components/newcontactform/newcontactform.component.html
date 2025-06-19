@@ -75,7 +75,6 @@
         <h4>Phone Numbers</h4>
         <button type="button" class="add-button" (click)="addPhoneNumber()">Add Phone Number</button>
       </div>
-      <h5>(+xx-xx-xxx-xxxx)</h5>
       <div *ngIf="validationErrors['phoneNumbers']" class="validation-error">
         {{ validationErrors['phoneNumbers'] }}
       </div>

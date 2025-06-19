@@ -22,7 +22,7 @@
       <label for="email">Email</label>
       <input id="email" formControlName="email" type="email">
       <div *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched" class="validation-error">
-        <div *ngIf="contactForm.get('email')?.errors?.['email']">Please enter a valid email address</div>
+        <div *ngIf="contactForm.get('email')?.errors?.['email']">Please enter a valid email address.</div>
       </div>
       <div *ngIf="validationErrors['email']" class="validation-error">
         {{ validationErrors['email'] }}
@@ -83,7 +83,7 @@
           <input [formControlName]="i" placeholder="Phone Number" required>
           <div *ngIf="phoneNumbers.controls[i].invalid && phoneNumbers.controls[i].touched" class="validation-error">
             <div *ngIf="phoneNumbers.controls[i].errors?.['required']">Phone number is required</div>
-            <div *ngIf="phoneNumbers.controls[i].errors?.['pattern']">Phone number should be either 11 numbers, or a + sign followed by 11 numbers. Spaces are allowed between number groups.</div>
+            <div *ngIf="phoneNumbers.controls[i].errors?.['pattern']">Please provide a valid phone number. Should not contain any spaces.</div>
           </div>
           <div *ngIf="validationErrors['phoneNumbers.' + i]" class="validation-error">
             {{ validationErrors['phoneNumbers.' + i] }}

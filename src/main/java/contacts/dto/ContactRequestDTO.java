@@ -25,8 +25,7 @@ public class ContactRequestDTO {
     private String email;
 
     @Valid
-    private List<@Pattern(regexp = "^(\\+?\\d{11}|\\+?\\d{1,2}[ ]\\d{1,2}[ ]\\d{1,3}[ ]\\d{1,4})$", 
-                         message = "Please provide a valid phone number.") String> phoneNumbers;
+    private List<String> phoneNumbers;
 
     @Valid
     private List<AddressDTO> addresses;

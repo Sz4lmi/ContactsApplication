@@ -64,8 +64,7 @@ export class NewcontactformComponent {
 
   addPhoneNumber() {
     this.phoneNumbers.push(this.fb.control('', [
-      Validators.required,
-      Validators.pattern('^(\\+?\\d{11}|\\+?\\d{1,2}[ ]\\d{1,2}[ ]\\d{1,3}[ ]\\d{1,4})$')
+      Validators.required
     ]));
   }
 

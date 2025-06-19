@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ContactService } from '../../services/contact.service';
 import { ContactList } from '../../models/contactlist';
 import { Contactrequest, Address as AddressRequest } from '../../models/contactrequest';
 import { AuthService } from '../../services/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-contactlist',
@@ -17,8 +18,43 @@ export class ContactlistComponent implements OnInit {
   editContactForm!: FormGroup;
   selectedContact: ContactList | null = null;
   expandedContactIds: Set<number> = new Set<number>();
+  validationErrors: { [key: string]: string } = {};
 
   isAdmin = false;
+
+  // Custom validator for phone numbers
+  phoneNumberValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+
+      if (!value) {
+        return null; // Let required validator handle empty values
+      }
+
+      // Check if the value matches the pattern (only digits, spaces, and optional + at the beginning)
+      const patternValid = /^(\+)?[0-9 ]+$/.test(value);
+
+      // Count the number of digits (excluding spaces and +)
+      const digitCount = value.replace(/[^0-9]/g, '').length;
+      const digitCountValid = digitCount === 10 || digitCount === 11;
+
+      if (!patternValid || !digitCountValid) {
+        return { 'phoneFormat': true };
+      }
+
+      return null;
+    };
+  }
+
+  // Validator to ensure either email or phone is provided
+  emailOrPhoneValidator(group: AbstractControl): ValidationErrors | null {
+    const email = group.get('email')?.value;
+    const phoneNumbers = group.get('phoneNumbers') as FormArray;
+    if ((!email || email === '') && (!phoneNumbers || phoneNumbers.length === 0 || phoneNumbers.controls.every(c => !c.value))) {
+      return { emailOrPhone: true };
+    }
+    return null;
+  }
 
   constructor(
     private contactService: ContactService,
@@ -52,14 +88,14 @@ export class ContactlistComponent implements OnInit {
     this.editContactForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: [''],
-      mothersName: [''],
-      birthDate: [''],
-      tajNumber: [''],
-      taxId: [''],
+      email: ['', Validators.email],
+      mothersName: ['', Validators.required],
+      birthDate: ['', Validators.required],
+      tajNumber: ['', Validators.required],
+      taxId: ['', Validators.required],
       phoneNumbers: this.fb.array([]),
       addresses: this.fb.array([])
-    });
+    }, { validators: this.emailOrPhoneValidator });
   }
 
   get phoneNumbers(): FormArray {
@@ -71,7 +107,10 @@ export class ContactlistComponent implements OnInit {
   }
 
   addPhoneNumber(): void {
-    this.phoneNumbers.push(this.fb.control(''));
+    this.phoneNumbers.push(this.fb.control('', [
+      Validators.required,
+      this.phoneNumberValidator()
+    ]));
   }
 
   removePhoneNumber(index: number): void {
@@ -95,6 +134,9 @@ export class ContactlistComponent implements OnInit {
   openEditModal(contact: ContactList): void {
     console.log('Opening edit modal for contact:', contact);
     this.selectedContact = contact;
+
+    // Clear previous validation errors
+    this.validationErrors = {};
 
     // Fetch the full contact details to populate the form
     this.contactService.getContactById(contact.id).subscribe(
@@ -124,7 +166,10 @@ export class ContactlistComponent implements OnInit {
           // Add phone numbers
           if (fullContact.phoneNumbers) {
             fullContact.phoneNumbers.forEach((phone: { phoneNumber: any; }) => {
-              this.phoneNumbers.push(this.fb.control(phone.phoneNumber));
+              this.phoneNumbers.push(this.fb.control(phone.phoneNumber, [
+                Validators.required,
+                this.phoneNumberValidator()
+              ]));
             });
           }
 
@@ -159,6 +204,9 @@ export class ContactlistComponent implements OnInit {
   }
 
   updateContact(): void {
+    // Clear previous validation errors
+    this.validationErrors = {};
+
     if (this.editContactForm.valid && this.selectedContact) {
       const formValue = this.editContactForm.value;
 
@@ -174,15 +222,29 @@ export class ContactlistComponent implements OnInit {
         addresses: formValue.addresses
       };
 
-      this.contactService.updateContact(this.selectedContact.id, contactRequest).subscribe(
-        () => {
+      this.contactService.updateContact(this.selectedContact.id, contactRequest).subscribe({
+        next: () => {
           this.loadContacts();
           this.closeEditModal();
         },
-        (error) => {
+        error: (error: HttpErrorResponse) => {
           console.error('Error updating contact:', error);
+
+          // Handle validation errors from the backend
+          if (error.status === 400 && error.error) {
+            // Store validation errors
+            this.validationErrors = error.error;
+
+            // Mark form controls as touched to trigger validation messages
+            Object.keys(this.validationErrors).forEach(field => {
+              const control = this.editContactForm.get(field);
+              if (control) {
+                control.markAsTouched();
+              }
+            });
+          }
         }
-      );
+      });
     }
   }
 

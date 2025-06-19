@@ -7,7 +7,8 @@ import {
   Validators,
   AbstractControl,
   ValidationErrors,
-  ReactiveFormsModule
+  ReactiveFormsModule,
+  ValidatorFn
 } from '@angular/forms';
 import { ContactService } from '../../services/contact.service';
 import { Contactrequest, Address } from '../../models/contactrequest';
@@ -27,6 +28,30 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class NewcontactformComponent {
   contactForm: FormGroup;
   validationErrors: { [key: string]: string } = {};
+
+  // Custom validator for phone numbers
+  phoneNumberValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+
+      if (!value) {
+        return null; // Let required validator handle empty values
+      }
+
+      // Check if the value matches the pattern (only digits, spaces, and optional + at the beginning)
+      const patternValid = /^(\+)?[0-9 ]+$/.test(value);
+
+      // Count the number of digits (excluding spaces and +)
+      const digitCount = value.replace(/[^0-9]/g, '').length;
+      const digitCountValid = digitCount === 10 || digitCount === 11;
+
+      if (!patternValid || !digitCountValid) {
+        return { 'phoneFormat': true };
+      }
+
+      return null;
+    };
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -64,7 +89,8 @@ export class NewcontactformComponent {
 
   addPhoneNumber() {
     this.phoneNumbers.push(this.fb.control('', [
-      Validators.required
+      Validators.required,
+      this.phoneNumberValidator()
     ]));
   }
 

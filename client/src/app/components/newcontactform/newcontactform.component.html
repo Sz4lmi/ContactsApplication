@@ -75,6 +75,7 @@
         <h4>Phone Numbers</h4>
         <button type="button" class="add-button" (click)="addPhoneNumber()">Add Phone Number</button>
       </div>
+      <h5>(+xx-xx-xxx-xxxx)</h5>
       <div *ngIf="validationErrors['phoneNumbers']" class="validation-error">
         {{ validationErrors['phoneNumbers'] }}
       </div>
@@ -83,6 +84,7 @@
           <input [formControlName]="i" placeholder="Phone Number" required>
           <div *ngIf="phoneNumbers.controls[i].invalid && phoneNumbers.controls[i].touched" class="validation-error">
             <div *ngIf="phoneNumbers.controls[i].errors?.['required']">Phone number is required</div>
+            <div *ngIf="phoneNumbers.controls[i].errors?.['phoneFormat']">Please enter a valid phone number</div>
           </div>
           <div *ngIf="validationErrors['phoneNumbers.' + i]" class="validation-error">
             {{ validationErrors['phoneNumbers.' + i] }}

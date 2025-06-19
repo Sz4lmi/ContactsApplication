@@ -33,7 +33,7 @@ public class ContactRequestDTOValidationTest {
         validDto.setEmail("john.doe@example.com");
         validDto.setPhoneNumbers(Arrays.asList("+36 30 123 4567"));
         validDto.setTajNumber("123456789");
-        validDto.setTaxId("ABC123456");
+        validDto.setTaxId("1234567890");
     }
 
     @Test
@@ -100,41 +100,28 @@ public class ContactRequestDTOValidationTest {
     }
 
     @Test
-    public void testInvalidTaxId_NoLetters() {
-        // Test tax ID with no letters
-        validDto.setTaxId("123456");
-        Set<ConstraintViolation<ContactRequestDTO>> violations = validator.validate(validDto);
+    public void testInvalidTaxId() {
+        // Test cases for invalid tax IDs
+        String[][] testCases = {
+            {"123456789", "Tax ID should be exactly 10 digits"}, // Too short (9 digits)
+            {"12345678901", "Tax ID should be exactly 10 digits"}, // Too long (11 digits)
+            {"ABCDEFGHIJ", "Tax ID should be exactly 10 digits"}, // Contains letters
+            {"123456789A", "Tax ID should be exactly 10 digits"}, // Contains letters
+            {"12345 6789", "Tax ID should be exactly 10 digits"}, // Contains spaces
+        };
 
-        assertFalse(violations.isEmpty(), "Tax ID with no letters should have validation errors");
-        boolean hasTaxIdError = violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("taxId") && 
-                               v.getMessage().contains("Tax ID should contain at least one letter"));
-        assertTrue(hasTaxIdError, "Should have error about missing letters in tax ID");
-    }
+        for (String[] testCase : testCases) {
+            String invalidTaxId = testCase[0];
+            String expectedErrorMessage = testCase[1];
 
-    @Test
-    public void testInvalidTaxId_NoNumbers() {
-        // Test tax ID with no numbers
-        validDto.setTaxId("ABCDEF");
-        Set<ConstraintViolation<ContactRequestDTO>> violations = validator.validate(validDto);
+            validDto.setTaxId(invalidTaxId);
+            Set<ConstraintViolation<ContactRequestDTO>> violations = validator.validate(validDto);
 
-        assertFalse(violations.isEmpty(), "Tax ID with no numbers should have validation errors");
-        boolean hasTaxIdError = violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("taxId") && 
-                               v.getMessage().contains("Tax ID should contain at least one number"));
-        assertTrue(hasTaxIdError, "Should have error about missing numbers in tax ID");
-    }
-
-    @Test
-    public void testInvalidTaxId_TooShort() {
-        // Test tax ID that's too short
-        validDto.setTaxId("A1");
-        Set<ConstraintViolation<ContactRequestDTO>> violations = validator.validate(validDto);
-
-        assertFalse(violations.isEmpty(), "Tax ID that's too short should have validation errors");
-        boolean hasTaxIdError = violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("taxId") && 
-                               v.getMessage().contains("Tax ID should be at least 6 characters"));
-        assertTrue(hasTaxIdError, "Should have error about tax ID being too short");
+            assertFalse(violations.isEmpty(), "Tax ID '" + invalidTaxId + "' should have validation errors");
+            boolean hasTaxIdError = violations.stream()
+                    .anyMatch(v -> v.getPropertyPath().toString().equals("taxId") && 
+                                   v.getMessage().contains(expectedErrorMessage));
+            assertTrue(hasTaxIdError, "Should have error about tax ID format for '" + invalidTaxId + "'");
+        }
     }
 }

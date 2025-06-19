@@ -1,5 +1,6 @@
 package contacts.dto;
 
+import contacts.validation.PhoneNumberList;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +26,7 @@ public class ContactRequestDTO {
     private String email;
 
     @Valid
+    @PhoneNumberList(message = "Please enter a valid phone number")
     private List<String> phoneNumbers;
 
     @Valid
@@ -35,9 +37,7 @@ public class ContactRequestDTO {
     private String tajNumber;
 
     @NotBlank(message = "Tax ID is required")
-    @Size(min = 6, message = "Tax ID should be at least 6 characters")
-    @Pattern(regexp = ".*[a-zA-Z].*", message = "Tax ID should contain at least one letter.")
-    @Pattern(regexp = ".*\\d.*", message = "Tax ID should contain at least one number.")
+    @Pattern(regexp = "^\\d{10}$", message = "Tax ID should be exactly 10 digits.")
     private String taxId;
 
     private String motherName;

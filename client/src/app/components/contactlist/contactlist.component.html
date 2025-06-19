@@ -89,23 +89,41 @@
           <div class="form-field">
             <label for="firstName">First Name</label>
             <input id="firstName" formControlName="firstName" required>
+            <div *ngIf="validationErrors['firstName']" class="validation-error">
+              {{ validationErrors['firstName'] }}
+            </div>
           </div>
           <div class="form-field">
             <label for="lastName">Last Name</label>
             <input id="lastName" formControlName="lastName" required>
+            <div *ngIf="validationErrors['lastName']" class="validation-error">
+              {{ validationErrors['lastName'] }}
+            </div>
           </div>
         </div>
         <div class="form-field">
           <label for="email">Email</label>
           <input id="email" formControlName="email" type="email">
+          <div *ngIf="editContactForm.get('email')?.invalid && editContactForm.get('email')?.touched" class="validation-error">
+            <div *ngIf="editContactForm.get('email')?.errors?.['email']">Please enter a valid email address.</div>
+          </div>
+          <div *ngIf="validationErrors['email']" class="validation-error">
+            {{ validationErrors['email'] }}
+          </div>
         </div>
         <div class="form-field">
           <label for="birthDate">Birth Date</label>
-          <input id="birthDate" formControlName="birthDate" type="date">
+          <input id="birthDate" formControlName="birthDate" type="date" required>
+          <div *ngIf="validationErrors['birthDate']" class="validation-error">
+            {{ validationErrors['birthDate'] }}
+          </div>
         </div>
         <div class="form-field">
           <label for="mothersName">Mother's Name</label>
-          <input id="mothersName" formControlName="mothersName">
+          <input id="mothersName" formControlName="mothersName" required>
+          <div *ngIf="validationErrors['mothersName'] || validationErrors['motherName']" class="validation-error">
+            {{ validationErrors['mothersName'] || validationErrors['motherName'] }}
+          </div>
         </div>
       </div>
 
@@ -115,11 +133,17 @@
         <div class="form-row">
           <div class="form-field">
             <label for="tajNumber">TAJ Number</label>
-            <input id="tajNumber" formControlName="tajNumber">
+            <input id="tajNumber" formControlName="tajNumber" required>
+            <div *ngIf="validationErrors['tajNumber']" class="validation-error">
+              {{ validationErrors['tajNumber'] }}
+            </div>
           </div>
           <div class="form-field">
             <label for="taxId">Tax ID</label>
-            <input id="taxId" formControlName="taxId">
+            <input id="taxId" formControlName="taxId" required>
+            <div *ngIf="validationErrors['taxId']" class="validation-error">
+              {{ validationErrors['taxId'] }}
+            </div>
           </div>
         </div>
       </div>
@@ -134,8 +158,21 @@
             <h4>Phone Numbers</h4>
             <button type="button" class="add-button" (click)="addPhoneNumber()">Add Phone Number</button>
           </div>
+          <h5>(+xx-xx-xxx-xxxx)</h5>
+          <div *ngIf="validationErrors['phoneNumbers']" class="validation-error">
+            {{ validationErrors['phoneNumbers'] }}
+          </div>
           <div class="array-item" *ngFor="let phone of phoneNumbers.controls; let i = index">
-            <input [formControlName]="i" placeholder="Phone Number">
+            <div class="phone-field-container">
+              <input [formControlName]="i" placeholder="Phone Number" required>
+              <div *ngIf="phoneNumbers.controls[i].invalid && phoneNumbers.controls[i].touched" class="validation-error">
+                <div *ngIf="phoneNumbers.controls[i].errors?.['required']">Phone number is required</div>
+                <div *ngIf="phoneNumbers.controls[i].errors?.['phoneFormat']">Please enter a valid phone number</div>
+              </div>
+              <div *ngIf="validationErrors['phoneNumbers.' + i]" class="validation-error">
+                {{ validationErrors['phoneNumbers.' + i] }}
+              </div>
+            </div>
             <button type="button" class="remove-button" (click)="removePhoneNumber(i)">Remove</button>
           </div>
           <div *ngIf="phoneNumbers.controls.length === 0" class="array-item">
@@ -149,16 +186,39 @@
             <h4>Addresses</h4>
             <button type="button" class="add-button" (click)="addAddress()">Add Address</button>
           </div>
+          <div *ngIf="validationErrors['addresses']" class="validation-error">
+            {{ validationErrors['addresses'] }}
+          </div>
           <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-fields">
-            <input formControlName="street" placeholder="Street" required>
-            <input formControlName="city" placeholder="City" required>
-            <input formControlName="zipCode" placeholder="Zip Code" required>
+            <div class="address-field-container">
+              <input formControlName="street" placeholder="Street" required>
+              <div *ngIf="validationErrors['addresses.' + i + '.street']" class="validation-error">
+                {{ validationErrors['addresses.' + i + '.street'] }}
+              </div>
+            </div>
+            <div class="address-field-container">
+              <input formControlName="city" placeholder="City" required>
+              <div *ngIf="validationErrors['addresses.' + i + '.city']" class="validation-error">
+                {{ validationErrors['addresses.' + i + '.city'] }}
+              </div>
+            </div>
+            <div class="address-field-container">
+              <input formControlName="zipCode" placeholder="Zip Code" required>
+              <div *ngIf="validationErrors['addresses.' + i + '.zipCode']" class="validation-error">
+                {{ validationErrors['addresses.' + i + '.zipCode'] }}
+              </div>
+            </div>
             <button type="button" class="remove-button" (click)="removeAddress(i)">Remove</button>
           </div>
           <div *ngIf="addresses.controls.length === 0" class="array-item">
             <p>No addresses added yet. Click "Add Address" to add one.</p>
           </div>
         </div>
+      </div>
+
+      <!-- Validation Error -->
+      <div *ngIf="editContactForm.errors?.['emailOrPhone']" class="validation-error">
+        Please provide at least an email or one phone number.
       </div>
 
       <!-- Submit Button -->

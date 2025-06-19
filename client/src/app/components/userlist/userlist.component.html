@@ -3,7 +3,7 @@
 
   <!-- List of user cards -->
   <div class="user-list">
-    <div *ngFor="let user of users" class="user-card" [class.expanded]="isUserExpanded(user.id)" (click)="toggleUserExpansion(user, $event)">
+    <div *ngFor="let user of getCurrentPageUsers()" class="user-card" [class.expanded]="isUserExpanded(user.id)" (click)="toggleUserExpansion(user, $event)">
       <div class="user-info">
         <h3>{{ user.username }}</h3>
         <p><strong>Role:</strong> {{ user.role === 'ROLE_ADMIN' ? 'Admin' : 'User' }}</p>
@@ -91,6 +91,29 @@
 
     <div *ngIf="users.length === 0" class="no-users">
       <p>No users found.</p>
+    </div>
+
+    <!-- Pagination controls -->
+    <div *ngIf="totalPages > 1" class="pagination-controls">
+      <button [disabled]="currentPage === 0" (click)="previousPage()" class="pagination-button">Previous</button>
+
+      <div class="page-numbers">
+        <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+          <button
+            [class.active]="i === currentPage"
+            (click)="goToPage(i)"
+            class="page-number-button">
+            {{ i + 1 }}
+          </button>
+        </ng-container>
+      </div>
+
+      <button [disabled]="currentPage === totalPages - 1" (click)="nextPage()" class="pagination-button">Next</button>
+    </div>
+
+    <!-- Page indicator -->
+    <div *ngIf="users.length > 0" class="page-indicator">
+      Page {{ currentPage + 1 }} of {{ totalPages }}
     </div>
   </div>
 </div>

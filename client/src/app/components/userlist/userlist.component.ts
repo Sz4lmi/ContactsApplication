@@ -18,6 +18,11 @@ export class UserlistComponent implements OnInit {
   expandedUserIds: Set<number> = new Set<number>();
   expandedContactIds: Set<number> = new Set<number>();
 
+  // Pagination properties
+  currentPage = 0;
+  pageSize = 3;
+  totalPages = 0;
+
   constructor(
     private userService: UserService,
     private contactService: ContactService,
@@ -37,12 +42,60 @@ export class UserlistComponent implements OnInit {
     this.userService.getAllUsers().subscribe(
       (data) => {
         this.users = data;
+        this.calculateTotalPages();
         this.logger.debug('UserlistComponent: loaded users =', data);
       },
       (error) => {
         this.logger.error('Error fetching users:', error);
       }
     );
+  }
+
+  /**
+   * Calculate the total number of pages based on the users array length and page size
+   */
+  calculateTotalPages(): void {
+    this.totalPages = Math.ceil(this.users.length / this.pageSize);
+    // Reset to first page if current page is out of bounds
+    if (this.currentPage >= this.totalPages) {
+      this.currentPage = Math.max(0, this.totalPages - 1);
+    }
+  }
+
+  /**
+   * Get the users for the current page
+   */
+  getCurrentPageUsers(): User[] {
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    return this.users.slice(startIndex, endIndex);
+  }
+
+  /**
+   * Navigate to the previous page
+   */
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+    }
+  }
+
+  /**
+   * Navigate to the next page
+   */
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+    }
+  }
+
+  /**
+   * Navigate to a specific page
+   */
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+    }
   }
 
   /**

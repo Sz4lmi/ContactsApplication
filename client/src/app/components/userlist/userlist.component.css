@@ -181,6 +181,73 @@
   color: #555;
 }
 
+/* Pagination styles */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.pagination-button {
+  padding: 8px 16px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.pagination-button:hover:not([disabled]) {
+  background-color: #3a7bc8;
+}
+
+.pagination-button[disabled] {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 5px;
+}
+
+.page-number-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.page-number-button:hover {
+  background-color: #e0e0e0;
+}
+
+.page-number-button.active {
+  background-color: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
+}
+
+.page-indicator {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
 /* Modal styles */
 .modal-overlay {
   position: fixed;

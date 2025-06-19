@@ -26,6 +26,9 @@
         <div *ngIf="userForm.get('username')?.errors?.['required']">Username is required</div>
         <div *ngIf="userForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</div>
       </div>
+      <div *ngIf="validationErrors['username']" class="validation-error">
+        {{ validationErrors['username'] }}
+      </div>
     </div>
 
     <!-- Password -->
@@ -40,6 +43,9 @@
       <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="validation-error">
         <div *ngIf="userForm.get('password')?.errors?.['required']">Password is required</div>
         <div *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+      </div>
+      <div *ngIf="validationErrors['password']" class="validation-error">
+        {{ validationErrors['password'] }}
       </div>
     </div>
 
@@ -56,6 +62,9 @@
       </select>
       <div *ngIf="userForm.get('role')?.invalid && userForm.get('role')?.touched" class="validation-error">
         <div *ngIf="userForm.get('role')?.errors?.['required']">Role is required</div>
+      </div>
+      <div *ngIf="validationErrors['role']" class="validation-error">
+        {{ validationErrors['role'] }}
       </div>
     </div>
   </div>

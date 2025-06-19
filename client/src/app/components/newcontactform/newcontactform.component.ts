@@ -12,6 +12,7 @@ import {
 import { ContactService } from '../../services/contact.service';
 import { Contactrequest, Address } from '../../models/contactrequest';
 import {Router} from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-newcontactform',
@@ -25,6 +26,7 @@ import {Router} from '@angular/router';
 })
 export class NewcontactformComponent {
   contactForm: FormGroup;
+  validationErrors: { [key: string]: string } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -61,7 +63,10 @@ export class NewcontactformComponent {
   }
 
   addPhoneNumber() {
-    this.phoneNumbers.push(this.fb.control('', Validators.required));
+    this.phoneNumbers.push(this.fb.control('', [
+      Validators.required,
+      Validators.pattern('^(\\+?\\d{11}|\\+?\\d{1,2}[ ]\\d{1,2}[ ]\\d{1,3}[ ]\\d{1,4})$')
+    ]));
   }
 
   removePhoneNumber(index: number) {
@@ -86,6 +91,9 @@ export class NewcontactformComponent {
   }
 
   onSubmit() {
+    // Clear previous validation errors
+    this.validationErrors = {};
+
     if (this.contactForm.valid) {
       // Create a contact request object from form data
       const contactRequest: Contactrequest = {
@@ -110,9 +118,22 @@ export class NewcontactformComponent {
           this.addresses.clear();
           this.router.navigate(['/contacts']);
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           console.error('Error creating contact:', error);
-          // Handle error (show error message, etc.)
+
+          // Handle validation errors from the backend
+          if (error.status === 400 && error.error) {
+            // Store validation errors
+            this.validationErrors = error.error;
+
+            // Mark form controls as touched to trigger validation messages
+            Object.keys(this.validationErrors).forEach(field => {
+              const control = this.contactForm.get(field);
+              if (control) {
+                control.markAsTouched();
+              }
+            });
+          }
         }
       });
     }

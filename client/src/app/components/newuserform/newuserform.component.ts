@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService, UserDTO } from '../../services/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-newuserform',
@@ -19,6 +20,7 @@ export class NewuserformComponent {
   errorMessage: string = '';
   successMessage: string = '';
   isSubmitting: boolean = false;
+  validationErrors: { [key: string]: string } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -40,6 +42,7 @@ export class NewuserformComponent {
     this.isSubmitting = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.validationErrors = {};
 
     const userData: UserDTO = {
       username: this.userForm.value.username,
@@ -57,9 +60,28 @@ export class NewuserformComponent {
           role: 'ROLE_USER'
         });
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
-        if (error.error && typeof error.error === 'string') {
+
+        // Handle validation errors from the backend
+        if (error.status === 400 && error.error && typeof error.error === 'object') {
+          // Store validation errors
+          this.validationErrors = error.error;
+
+          // Mark form controls as touched to trigger validation messages
+          Object.keys(this.validationErrors).forEach(field => {
+            const control = this.userForm.get(field);
+            if (control) {
+              control.markAsTouched();
+            }
+          });
+
+          // If there are validation errors but none match our form fields, show a general error
+          if (Object.keys(this.validationErrors).length > 0 &&
+              !Object.keys(this.validationErrors).some(key => this.userForm.get(key))) {
+            this.errorMessage = 'Please correct the validation errors below.';
+          }
+        } else if (error.error && typeof error.error === 'string') {
           this.errorMessage = error.error;
         } else if (error.message) {
           this.errorMessage = error.message;

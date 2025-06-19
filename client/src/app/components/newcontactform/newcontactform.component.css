@@ -83,11 +83,17 @@ form {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.phone-field-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .array-item input {
-  flex: 1;
+  width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -99,11 +105,17 @@ form {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.address-field-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .address-fields input {
-  flex: 1;
+  width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;

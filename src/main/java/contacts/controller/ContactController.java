@@ -7,6 +7,7 @@ import contacts.service.ContactService;
 import contacts.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -128,10 +129,11 @@ public class ContactController {
      * @return The created contact
      */
     @PostMapping
-    public Contact createContact(@RequestBody ContactRequestDTO dto, HttpServletRequest request) {
+    public ResponseEntity<?> createContact(@Valid @RequestBody ContactRequestDTO dto, HttpServletRequest request) {
         // Extract user ID from JWT token
         Long userId = getUserIdFromToken(request);
-        return contactService.saveContact(dto, userId);
+        Contact contact = contactService.saveContact(dto, userId);
+        return ResponseEntity.ok(contact);
     }
 
     /**
@@ -146,7 +148,7 @@ public class ContactController {
     @PutMapping("/{id}")
     public ResponseEntity<Contact> updateContact(
             @PathVariable Long id,
-            @RequestBody ContactRequestDTO dto,
+            @Valid @RequestBody ContactRequestDTO dto,
             HttpServletRequest request) {
         // Extract user ID and role from JWT token
         Long userId = getUserIdFromToken(request);

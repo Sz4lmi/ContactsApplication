@@ -7,7 +7,7 @@
       <div class="user-info">
         <h3>{{ user.username }}</h3>
         <p><strong>Role:</strong> {{ user.role === 'ROLE_ADMIN' ? 'Admin' : 'User' }}</p>
-        <p><strong>Contacts:</strong> {{ user.contacts?.length || 0 }}</p>
+        <p><strong>Contacts:</strong> {{ user.contacts.length || 0 }}</p>
 
         <!-- Expansion indicator -->
         <div class="expansion-indicator">

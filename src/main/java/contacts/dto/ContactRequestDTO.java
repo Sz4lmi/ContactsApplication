@@ -19,7 +19,7 @@ public class ContactRequestDTO {
     private String tajNumber;
     private String taxId;
     private String motherName;
-    private LocalDate birthDate; // vagy LocalDate, ha úgy szereted
+    private LocalDate birthDate;
 
 
     @Data

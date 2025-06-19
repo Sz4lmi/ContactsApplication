@@ -65,7 +65,7 @@ export class NewcontactformComponent {
       tajNumber: ['', Validators.required],
       taxId: ['', Validators.required],
       birthDate: ['', Validators.required],
-      mothersName: ['', Validators.required],
+      motherName: ['', Validators.required],
       phoneNumbers: this.fb.array([]),
       addresses: this.fb.array([])
     }, { validators: this.emailOrPhoneValidator });
@@ -128,7 +128,7 @@ export class NewcontactformComponent {
         tajNumber: this.contactForm.value.tajNumber,
         taxId: this.contactForm.value.taxId,
         birthDate: this.contactForm.value.birthDate,
-        motherName: this.contactForm.value.mothersName, // Note the field name difference
+        motherName: this.contactForm.value.motherName,
         phoneNumbers: this.contactForm.value.phoneNumbers || [],
         addresses: this.contactForm.value.addresses || []
       };

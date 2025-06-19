@@ -30,7 +30,7 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
 
         if (!matchesPattern || !hasValidDigitCount) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Phone number should be either 11 numbers")
+            context.buildConstraintViolationWithTemplate("Phone number should be 10 or 11 digits")
                    .addConstraintViolation();
             return false;
         }

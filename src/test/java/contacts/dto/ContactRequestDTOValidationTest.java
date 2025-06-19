@@ -65,7 +65,7 @@ public class ContactRequestDTOValidationTest {
         assertFalse(violations.isEmpty(), "Invalid phone number should have validation errors");
         boolean hasPhoneError = violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().contains("phoneNumbers") && 
-                               v.getMessage().contains("Phone number should be either 11 numbers"));
+                               v.getMessage().contains("Phone number should be 10 or 11 digits"));
         assertTrue(hasPhoneError, "Should have error about phone number format");
     }
 

@@ -39,7 +39,7 @@ public class PhoneNumberListValidator implements ConstraintValidator<PhoneNumber
 
                 if (!matchesPattern || !hasValidDigitCount) {
                     // Add a custom error message for each invalid phone number
-                    context.buildConstraintViolationWithTemplate("Phone number should be either 11 numbers")
+                    context.buildConstraintViolationWithTemplate("Phone number should be 10 or 11 digits")
                            .addPropertyNode("phoneNumbers")
                            .addBeanNode()
                            .inIterable().atIndex(i)

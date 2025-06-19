@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
  * Provides methods for extracting information from JWT tokens.
  */
 public class JwtUtils {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-    
+
     /**
      * Extracts the user ID from the JWT token in the request.
      *
@@ -23,10 +23,10 @@ public class JwtUtils {
      */
     public static Long getUserIdFromToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7); // Remove "Bearer " prefix
-            
+
             try {
                 Claims claims = Jwts.parser()
                         .setSigningKey(SecurityConstants.SECRET_KEY)
@@ -53,10 +53,10 @@ public class JwtUtils {
      */
     public static String getRoleFromToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7); // Remove "Bearer " prefix
-            
+
             try {
                 Claims claims = Jwts.parser()
                         .setSigningKey(SecurityConstants.SECRET_KEY)
@@ -65,6 +65,35 @@ public class JwtUtils {
 
                 // Get role from claims
                 return claims.get("role", String.class);
+            } catch (Exception e) {
+                // Token validation failed
+                logger.debug("Token validation failed: {}", e.getMessage());
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extracts the username from the JWT token in the request.
+     *
+     * @param request The HTTP request containing the JWT token
+     * @return The username or null if not found or token is invalid
+     */
+    public static String getUsernameFromToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7); // Remove "Bearer " prefix
+
+            try {
+                Claims claims = Jwts.parser()
+                        .setSigningKey(SecurityConstants.SECRET_KEY)
+                        .parseClaimsJws(token)
+                        .getBody();
+
+                // Get subject (username) from claims
+                return claims.getSubject();
             } catch (Exception e) {
                 // Token validation failed
                 logger.debug("Token validation failed: {}", e.getMessage());

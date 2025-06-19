@@ -105,16 +105,16 @@
 
     <form [formGroup]="editUserForm" (ngSubmit)="updateUser()">
       <div class="form-field">
-        <label for="username">Username</label>
-        <input id="username" formControlName="username" required>
+        <label for="oldPassword">Admin Password</label>
+        <input id="oldPassword" formControlName="oldPassword" type="password">
+        <small *ngIf="editUserForm.value.username !== selectedUser?.username || editUserForm.value.newPassword">
+          * Admin password required when changing username or password
+        </small>
       </div>
 
       <div class="form-field">
-        <label for="oldPassword">Old Password</label>
-        <input id="oldPassword" formControlName="oldPassword" type="password">
-        <small *ngIf="editUserForm.value.username !== selectedUser?.username || editUserForm.value.newPassword">
-          * Required when changing username or password
-        </small>
+        <label for="username">Username</label>
+        <input id="username" formControlName="username" required>
       </div>
 
       <div class="form-field">

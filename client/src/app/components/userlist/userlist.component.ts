@@ -75,9 +75,9 @@ export class UserlistComponent implements OnInit {
     if (this.editUserForm.valid && this.selectedUser) {
       const formValue = this.editUserForm.value;
 
-      // Only require old password if username or new password is changed
+      // Only require admin password if username or new password is changed
       if ((formValue.username !== this.selectedUser.username || formValue.newPassword) && !formValue.oldPassword) {
-        alert('Old password is required when changing username or password');
+        alert('Admin password is required when changing username or password');
         return;
       }
 

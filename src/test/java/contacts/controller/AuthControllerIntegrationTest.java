@@ -206,11 +206,12 @@ public class AuthControllerIntegrationTest {
     @Test
     void updateUser_AsAdmin_ShouldUpdateUser() throws Exception {
         // Arrange
-        when(userService.updateUser(any(Long.class), any(UserDTO.class))).thenReturn(testUser);
+        when(userService.updateUser(any(Long.class), any(UserDTO.class), anyString())).thenReturn(testUser);
 
         // Act & Assert
         try (MockedStatic<JwtUtils> jwtUtils = Mockito.mockStatic(JwtUtils.class)) {
             jwtUtils.when(() -> JwtUtils.getRoleFromToken(any())).thenReturn("ROLE_ADMIN");
+            jwtUtils.when(() -> JwtUtils.getUsernameFromToken(any())).thenReturn("admin");
 
             mockMvc.perform(put("/api/auth/users/1")
                     .header("Authorization", adminToken)

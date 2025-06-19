@@ -153,7 +153,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void updateUser_WithValidData_ShouldUpdateUser() {
+    void updateUser_WithValidData_AsUser_ShouldUpdateUser() {
         // Arrange
         UserDTO updateDTO = new UserDTO();
         updateDTO.setUsername("updateduser");
@@ -168,12 +168,47 @@ public class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         // Act
-        User result = userService.updateUser(1L, updateDTO);
+        User result = userService.updateUser(1L, updateDTO, null); // null adminUsername means user is updating themselves
 
         // Assert
         assertNotNull(result);
         verify(userRepository).findById(1L);
         verify(passwordEncoder).matches(eq("password"), anyString());
+        verify(userRepository).findByUsername("updateduser");
+        verify(passwordEncoder).encode("newpassword");
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void updateUser_WithValidData_AsAdmin_ShouldUpdateUser() {
+        // Arrange
+        UserDTO updateDTO = new UserDTO();
+        updateDTO.setUsername("updateduser");
+        updateDTO.setPassword("newpassword");
+        updateDTO.setOldPassword("adminpassword");
+        updateDTO.setRole("ROLE_ADMIN");
+
+        User adminUser = new User();
+        adminUser.setId(2L);
+        adminUser.setUsername("admin");
+        adminUser.setPassword("hashedadminpassword");
+        adminUser.setRole("ROLE_ADMIN");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+        when(passwordEncoder.matches(eq("adminpassword"), anyString())).thenReturn(true);
+        when(userRepository.findByUsername("updateduser")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("newpassword")).thenReturn("newhashed");
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        // Act
+        User result = userService.updateUser(1L, updateDTO, "admin"); // admin is updating the user
+
+        // Assert
+        assertNotNull(result);
+        verify(userRepository).findById(1L);
+        verify(userRepository).findByUsername("admin");
+        verify(passwordEncoder).matches(eq("adminpassword"), anyString());
         verify(userRepository).findByUsername("updateduser");
         verify(passwordEncoder).encode("newpassword");
         verify(userRepository).save(any(User.class));
@@ -192,7 +227,7 @@ public class UserServiceTest {
 
         // Act & Assert
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            userService.updateUser(1L, updateDTO);
+            userService.updateUser(1L, updateDTO, null);
         });
         assertEquals("Old password is incorrect", exception.getMessage());
         verify(userRepository, times(1)).findById(1L);
@@ -218,7 +253,7 @@ public class UserServiceTest {
 
         // Act & Assert
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            userService.updateUser(1L, updateDTO);
+            userService.updateUser(1L, updateDTO, null);
         });
         assertEquals("Username already exists", exception.getMessage());
         verify(userRepository, times(1)).findById(1L);

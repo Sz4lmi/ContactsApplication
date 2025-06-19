@@ -77,23 +77,40 @@ public class UserService {
      * Update an existing user
      * @param id User ID
      * @param userDTO User data transfer object
+     * @param adminUsername Username of the admin performing the update (null if not admin)
      * @return Updated user
      */
-    public User updateUser(Long id, UserDTO userDTO) {
+    public User updateUser(Long id, UserDTO userDTO, String adminUsername) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if username or password is being changed and verify old password
+        // Check if username or password is being changed and verify password
         boolean isChangingUsername = userDTO.getUsername() != null && !userDTO.getUsername().isEmpty() && !userDTO.getUsername().equals(user.getUsername());
         boolean isChangingPassword = userDTO.getPassword() != null && !userDTO.getPassword().isEmpty();
 
-        if ((isChangingUsername || isChangingPassword) && userDTO.getOldPassword() != null) {
-            // Verify old password
-            if (!passwordEncoder.matches(userDTO.getOldPassword(), user.getPassword())) {
-                throw new RuntimeException("Old password is incorrect");
+        if ((isChangingUsername || isChangingPassword)) {
+            if (adminUsername != null) {
+                // Admin is making the change, verify admin's password
+                User admin = userRepository.findByUsername(adminUsername)
+                        .orElseThrow(() -> new RuntimeException("Admin user not found"));
+
+                if (userDTO.getOldPassword() == null || userDTO.getOldPassword().isEmpty()) {
+                    throw new RuntimeException("Admin password is required when changing username or password");
+                }
+
+                if (!passwordEncoder.matches(userDTO.getOldPassword(), admin.getPassword())) {
+                    throw new RuntimeException("Admin password is incorrect");
+                }
+            } else {
+                // Regular user is changing their own details, verify their password
+                if (userDTO.getOldPassword() == null || userDTO.getOldPassword().isEmpty()) {
+                    throw new RuntimeException("Old password is required when changing username or password");
+                }
+
+                if (!passwordEncoder.matches(userDTO.getOldPassword(), user.getPassword())) {
+                    throw new RuntimeException("Old password is incorrect");
+                }
             }
-        } else if ((isChangingUsername || isChangingPassword) && (userDTO.getOldPassword() == null || userDTO.getOldPassword().isEmpty())) {
-            throw new RuntimeException("Old password is required when changing username or password");
         }
 
         // Update username if provided and not already taken by another user

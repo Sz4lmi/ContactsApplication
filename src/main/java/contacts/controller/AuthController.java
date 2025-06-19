@@ -141,7 +141,9 @@ public class AuthController {
         }
 
         try {
-            User updatedUser = userService.updateUser(id, userDTO);
+            // Get the admin's username from the token
+            String adminUsername = JwtUtils.getUsernameFromToken(request);
+            User updatedUser = userService.updateUser(id, userDTO, adminUsername);
             return ResponseEntity.ok(updatedUser);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

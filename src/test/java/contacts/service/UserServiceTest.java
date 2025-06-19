@@ -158,7 +158,7 @@ public class UserServiceTest {
         UserDTO updateDTO = new UserDTO();
         updateDTO.setUsername("updateduser");
         updateDTO.setPassword("newpassword");
-        updateDTO.setOldPassword("password");
+        updateDTO.setAdminPassword("password");
         updateDTO.setRole("ROLE_ADMIN");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
@@ -185,7 +185,7 @@ public class UserServiceTest {
         UserDTO updateDTO = new UserDTO();
         updateDTO.setUsername("updateduser");
         updateDTO.setPassword("newpassword");
-        updateDTO.setOldPassword("adminpassword");
+        updateDTO.setAdminPassword("adminpassword");
         updateDTO.setRole("ROLE_ADMIN");
 
         User adminUser = new User();
@@ -215,23 +215,31 @@ public class UserServiceTest {
     }
 
     @Test
-    void updateUser_WithIncorrectOldPassword_ShouldThrowException() {
+    void updateUser_WithIncorrectAdminPassword_ShouldThrowException() {
         // Arrange
         UserDTO updateDTO = new UserDTO();
         updateDTO.setUsername("updateduser");
         updateDTO.setPassword("newpassword");
-        updateDTO.setOldPassword("wrongpassword");
+        updateDTO.setAdminPassword("wrongpassword");
+
+        User adminUser = new User();
+        adminUser.setId(2L);
+        adminUser.setUsername("admin");
+        adminUser.setPassword("hashedadminpassword");
+        adminUser.setRole("ROLE_ADMIN");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches(updateDTO.getOldPassword(), testUser.getPassword())).thenReturn(false);
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+        when(passwordEncoder.matches(updateDTO.getAdminPassword(), adminUser.getPassword())).thenReturn(false);
 
         // Act & Assert
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            userService.updateUser(1L, updateDTO, null);
+            userService.updateUser(1L, updateDTO, "admin");
         });
-        assertEquals("Old password is incorrect", exception.getMessage());
+        assertEquals("Admin password is incorrect", exception.getMessage());
         verify(userRepository, times(1)).findById(1L);
-        verify(passwordEncoder, times(1)).matches(updateDTO.getOldPassword(), testUser.getPassword());
+        verify(userRepository, times(1)).findByUsername("admin");
+        verify(passwordEncoder, times(1)).matches(updateDTO.getAdminPassword(), adminUser.getPassword());
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -245,10 +253,10 @@ public class UserServiceTest {
         UserDTO updateDTO = new UserDTO();
         updateDTO.setUsername("existinguser");
         updateDTO.setPassword("newpassword");
-        updateDTO.setOldPassword("password");
+        updateDTO.setAdminPassword("password");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches(updateDTO.getOldPassword(), testUser.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(updateDTO.getAdminPassword(), testUser.getPassword())).thenReturn(true);
         when(userRepository.findByUsername(updateDTO.getUsername())).thenReturn(Optional.of(existingUser));
 
         // Act & Assert
@@ -257,7 +265,7 @@ public class UserServiceTest {
         });
         assertEquals("Username already exists", exception.getMessage());
         verify(userRepository, times(1)).findById(1L);
-        verify(passwordEncoder, times(1)).matches(updateDTO.getOldPassword(), testUser.getPassword());
+        verify(passwordEncoder, times(1)).matches(updateDTO.getAdminPassword(), testUser.getPassword());
         verify(userRepository, times(1)).findByUsername(updateDTO.getUsername());
         verify(userRepository, never()).save(any(User.class));
     }

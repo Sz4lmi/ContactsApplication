@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 export interface UserDTO {
   username: string;
   password: string;
-  oldPassword?: string;
+  adminPassword?: string;
   role?: string;
 }
 

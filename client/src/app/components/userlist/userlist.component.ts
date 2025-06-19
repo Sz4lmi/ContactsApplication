@@ -104,7 +104,7 @@ export class UserlistComponent implements OnInit {
   initForm(): void {
     this.editUserForm = this.fb.group({
       username: ['', Validators.required],
-      oldPassword: [''],
+      adminPassword: [''],
       newPassword: ['']
     });
   }
@@ -113,7 +113,7 @@ export class UserlistComponent implements OnInit {
     this.selectedUser = user;
     this.editUserForm.patchValue({
       username: user.username,
-      oldPassword: '',
+      adminPassword: '',
       newPassword: ''
     });
     this.showEditModal = true;
@@ -129,7 +129,7 @@ export class UserlistComponent implements OnInit {
       const formValue = this.editUserForm.value;
 
       // Only require admin password if username or new password is changed
-      if ((formValue.username !== this.selectedUser.username || formValue.newPassword) && !formValue.oldPassword) {
+      if ((formValue.username !== this.selectedUser.username || formValue.newPassword) && !formValue.adminPassword) {
         alert('Admin password is required when changing username or password');
         return;
       }
@@ -137,7 +137,7 @@ export class UserlistComponent implements OnInit {
       const userDTO: UserDTO = {
         username: formValue.username,
         password: formValue.newPassword || '',
-        oldPassword: formValue.oldPassword || ''
+        adminPassword: formValue.oldPassword || ''
       };
 
       this.userService.updateUser(this.selectedUser.id, userDTO).subscribe(

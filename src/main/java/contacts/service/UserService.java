@@ -94,20 +94,20 @@ public class UserService {
                 User admin = userRepository.findByUsername(adminUsername)
                         .orElseThrow(() -> new RuntimeException("Admin user not found"));
 
-                if (userDTO.getOldPassword() == null || userDTO.getOldPassword().isEmpty()) {
+                if (userDTO.getAdminPassword() == null || userDTO.getAdminPassword().isEmpty()) {
                     throw new RuntimeException("Admin password is required when changing username or password");
                 }
 
-                if (!passwordEncoder.matches(userDTO.getOldPassword(), admin.getPassword())) {
+                if (!passwordEncoder.matches(userDTO.getAdminPassword(), admin.getPassword())) {
                     throw new RuntimeException("Admin password is incorrect");
                 }
             } else {
                 // Regular user is changing their own details, verify their password
-                if (userDTO.getOldPassword() == null || userDTO.getOldPassword().isEmpty()) {
+                if (userDTO.getAdminPassword() == null || userDTO.getAdminPassword().isEmpty()) {
                     throw new RuntimeException("Old password is required when changing username or password");
                 }
 
-                if (!passwordEncoder.matches(userDTO.getOldPassword(), user.getPassword())) {
+                if (!passwordEncoder.matches(userDTO.getAdminPassword(), user.getPassword())) {
                     throw new RuntimeException("Old password is incorrect");
                 }
             }

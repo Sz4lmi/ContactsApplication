@@ -83,7 +83,6 @@
           <input [formControlName]="i" placeholder="Phone Number" required>
           <div *ngIf="phoneNumbers.controls[i].invalid && phoneNumbers.controls[i].touched" class="validation-error">
             <div *ngIf="phoneNumbers.controls[i].errors?.['required']">Phone number is required</div>
-            <div *ngIf="phoneNumbers.controls[i].errors?.['pattern']">Please provide a valid phone number. Should not contain any spaces.</div>
           </div>
           <div *ngIf="validationErrors['phoneNumbers.' + i]" class="validation-error">
             {{ validationErrors['phoneNumbers.' + i] }}

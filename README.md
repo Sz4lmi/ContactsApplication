@@ -54,7 +54,7 @@ Docker and Docker Compose
 1. Clone the repository:
 ```
 git clone https://github.com/Sz4lmi/ContactsApplication
-cd contacts
+cd <contacts>
 ```
 2. Start the application using Docker Compose:
 ```
@@ -82,7 +82,7 @@ Frontend
 1. Install Node.js and npm
 2. Navigate to the client directory:
 ```
-cd client
+cd <client>
 ```
 3. Install dependencies:
 ```

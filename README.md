@@ -65,6 +65,12 @@ docker compose up -d
 - Frontend: http://localhost:4200
 - Backend API: http://localhost:8080
 - API Documentation: http://localhost:8080/swagger-ui.html
+- Admin user:
+  - username: admin
+  - password: admin
+- Normal users:
+  - username: "test1", "test2", "test3", etc...
+  - password: "123456" for all normal users
 
 ### Development Setup
 

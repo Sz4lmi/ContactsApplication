@@ -81,21 +81,21 @@ public class ContactService {
      * @throws RuntimeException if the user is not found
      */
     public List<ContactListDTO> getContactListByUserId(Long userId) {
-        logger.debug("ContactService.getContactListByUserId: userId = {}", userId);
+        logger.debug("userId = {}", userId);
 
         // Find the user by ID
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        logger.debug("ContactService.getContactListByUserId: found user = {}, role = {}", user.getUsername(), user.getRole());
+        logger.debug("found user = {}, role = {}", user.getUsername(), user.getRole());
 
         // Get the user's contacts
         List<Contact> contacts = user.getContacts();
-        logger.debug("ContactService.getContactListByUserId: found {} contacts for user", contacts.size());
+        logger.debug("found {} contacts for user", contacts.size());
 
         // Log each contact
         contacts.forEach(contact -> {
-            logger.debug("ContactService.getContactListByUserId: contact id={}, firstName={}, lastName={}", 
+            logger.debug("contact id={}, firstName={}, lastName={}",
                 contact.getId(), contact.getFirstName(), contact.getLastName());
         });
 
@@ -104,7 +104,7 @@ public class ContactService {
                 .map(this::convertToContactListDTO)
                 .collect(Collectors.toList());
 
-        logger.debug("ContactService.getContactListByUserId: returning {} DTOs", dtos.size());
+        logger.debug("returning {} DTOs", dtos.size());
         return dtos;
     }
 
@@ -116,11 +116,11 @@ public class ContactService {
     public List<ContactListDTO> getAllContactsAsList() {
         // Get all contacts
         List<Contact> contacts = contactRepository.findAll();
-        logger.debug("ContactService.getAllContactsAsList: found {} contacts", contacts.size());
+        logger.debug("found {} contacts", contacts.size());
 
         // Log each contact
         contacts.forEach(contact -> {
-            logger.debug("ContactService.getAllContactsAsList: contact id={}, firstName={}, lastName={}, userId={}", 
+            logger.debug("contact id={}, firstName={}, lastName={}, userId={}",
                 contact.getId(), contact.getFirstName(), contact.getLastName(), 
                 (contact.getUser() != null ? contact.getUser().getId() : "null"));
         });
@@ -130,7 +130,7 @@ public class ContactService {
                 .map(this::convertToContactListDTO)
                 .collect(Collectors.toList());
 
-        logger.debug("ContactService.getAllContactsAsList: returning {} DTOs", dtos.size());
+        logger.debug("returning {} DTOs", dtos.size());
         return dtos;
     }
 

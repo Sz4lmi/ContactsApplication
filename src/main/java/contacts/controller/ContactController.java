@@ -100,24 +100,24 @@ public class ContactController {
         Long userId = getUserIdFromToken(request);
         String role = getRoleFromToken(request);
 
-        logger.debug("ContactController.getContactList: userId = {}, role = {}", userId, role);
+        logger.debug("userId = {}, role = {}", userId, role);
 
         // If user is admin, return all contacts
         if (role != null && role.equals("ROLE_ADMIN")) {
             List<ContactListDTO> allContacts = contactService.getAllContactsAsList();
-            logger.debug("ContactController.getContactList: returning all contacts, count = {}", allContacts.size());
+            logger.debug("returning all contacts, count = {}", allContacts.size());
             return allContacts;
         }
 
         // If we have a userId, get contacts for that user
         if (userId != null) {
             List<ContactListDTO> userContacts = contactService.getContactListByUserId(userId);
-            logger.debug("ContactController.getContactList: returning user contacts, count = {}", userContacts.size());
+            logger.debug("returning user contacts, count = {}", userContacts.size());
             return userContacts;
         }
 
         // Otherwise, return an empty list
-        logger.debug("ContactController.getContactList: returning empty list");
+        logger.debug("returning empty list");
         return List.of();
     }
 

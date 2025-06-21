@@ -107,7 +107,7 @@
       </div>
       <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-fields">
         <div class="address-field-container">
-          <input formControlName="street" placeholder="Adress" required>
+          <input formControlName="street" placeholder="Address" required>
           <div *ngIf="validationErrors['addresses.' + i + '.street']" class="validation-error">
             {{ validationErrors['addresses.' + i + '.street'] }}
           </div>

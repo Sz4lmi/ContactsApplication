@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
+import java.util.List;
+
 @Data
-public class UserDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserListDTO {
+    private Long id;
     private String username;
-    private String password;
-    private String adminPassword;
     private String role;
+    private List<ContactListDTO> contacts;
 }

@@ -11,7 +11,7 @@ import {
   ValidatorFn
 } from '@angular/forms';
 import { ContactService } from '../../services/contact.service';
-import { Contactrequest, Address } from '../../models/contactrequest';
+import { ContactrequestDTO, Address } from '../../models/contactrequestDTO';
 import {Router} from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -121,7 +121,7 @@ export class NewcontactformComponent {
 
     if (this.contactForm.valid) {
       // Create a contact request object from form data
-      const contactRequest: Contactrequest = {
+      const contactRequest: ContactrequestDTO = {
         firstName: this.contactForm.value.firstName,
         lastName: this.contactForm.value.lastName,
         email: this.contactForm.value.email,

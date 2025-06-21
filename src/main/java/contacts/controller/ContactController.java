@@ -47,7 +47,7 @@ public class ContactController {
      * @return The contact or 404 if not found or not accessible
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Contact> getContactById(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<ContactListDTO> getContactById(@PathVariable Long id, HttpServletRequest request) {
         // Extract user ID from JWT token
         Long userId = getUserIdFromToken(request);
         String role = getRoleFromToken(request);
@@ -56,10 +56,10 @@ public class ContactController {
         Contact contact = contactService.getContactById(id);
 
         // Check if user has access to this contact
-        if (contact != null && (role != null && role.equals("ROLE_ADMIN") || 
-                               (userId != null && contact.getUser() != null && 
-                                contact.getUser().getId().equals(userId)))) {
-            return ResponseEntity.ok(contact);
+        if (contact != null && (role != null && role.equals("ROLE_ADMIN") ||
+                (userId != null && contact.getUser() != null &&
+                        contact.getUser().getId().equals(userId)))) {
+            return ResponseEntity.ok(contactService.convertToContactListDTO(contact));
         }
 
         return ResponseEntity.notFound().build();
@@ -74,17 +74,17 @@ public class ContactController {
      * @return List of contacts
      */
     @GetMapping
-    public List<Contact> getAllContacts(HttpServletRequest request) {
+    public List<ContactListDTO> getAllContacts(HttpServletRequest request) {
         // Extract user ID from JWT token
         Long userId = getUserIdFromToken(request);
 
         // If we have a userId, filter contacts by user
         if (userId != null) {
-            return contactService.getContactsByUserId(userId);
+            return contactService.getContactListByUserId(userId);
         }
 
         // Otherwise, return all contacts (this should be restricted in a real app)
-        return contactService.getAllContacts();
+        return contactService.getAllContactsAsList();
     }
 
     /**
@@ -133,7 +133,7 @@ public class ContactController {
         // Extract user ID from JWT token
         Long userId = getUserIdFromToken(request);
         Contact contact = contactService.saveContact(dto, userId);
-        return ResponseEntity.ok(contact);
+        return ResponseEntity.ok(ContactService.convertToContactListDTO(contact));
     }
 
     /**
@@ -146,7 +146,7 @@ public class ContactController {
      * @return The updated contact or appropriate error response
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Contact> updateContact(
+    public ResponseEntity<ContactListDTO> updateContact(
             @PathVariable Long id,
             @Valid @RequestBody ContactRequestDTO dto,
             HttpServletRequest request) {
@@ -157,7 +157,7 @@ public class ContactController {
         // Update the contact
         Contact updatedContact = contactService.updateContact(id, dto, userId);
 
-        return ResponseEntity.ok(updatedContact);
+        return ResponseEntity.ok(contactService.convertToContactListDTO(updatedContact));
     }
 
     /**

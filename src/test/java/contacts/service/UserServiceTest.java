@@ -1,7 +1,7 @@
 package contacts.service;
 
 import contacts.domain.User;
-import contacts.dto.UserDTO;
+import contacts.dto.UserRequestDTO;
 import contacts.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class UserServiceTest {
     private UserService userService;
 
     private User testUser;
-    private UserDTO testUserDTO;
+    private UserRequestDTO testUserDTO;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +45,7 @@ public class UserServiceTest {
         testUser.setRole("ROLE_USER");
 
         // Setup test user DTO
-        testUserDTO = new UserDTO();
+        testUserDTO = new UserRequestDTO();
         testUserDTO.setUsername("testuser");
         testUserDTO.setPassword("password");
         testUserDTO.setRole("ROLE_USER");
@@ -155,7 +155,7 @@ public class UserServiceTest {
     @Test
     void updateUser_WithValidData_AsUser_ShouldUpdateUser() {
         // Arrange
-        UserDTO updateDTO = new UserDTO();
+        UserRequestDTO updateDTO = new UserRequestDTO();
         updateDTO.setUsername("updateduser");
         updateDTO.setPassword("newpassword");
         updateDTO.setAdminPassword("password");
@@ -182,7 +182,7 @@ public class UserServiceTest {
     @Test
     void updateUser_WithValidData_AsAdmin_ShouldUpdateUser() {
         // Arrange
-        UserDTO updateDTO = new UserDTO();
+        UserRequestDTO updateDTO = new UserRequestDTO();
         updateDTO.setUsername("updateduser");
         updateDTO.setPassword("newpassword");
         updateDTO.setAdminPassword("adminpassword");
@@ -217,7 +217,7 @@ public class UserServiceTest {
     @Test
     void updateUser_WithIncorrectAdminPassword_ShouldThrowException() {
         // Arrange
-        UserDTO updateDTO = new UserDTO();
+        UserRequestDTO updateDTO = new UserRequestDTO();
         updateDTO.setUsername("updateduser");
         updateDTO.setPassword("newpassword");
         updateDTO.setAdminPassword("wrongpassword");
@@ -250,7 +250,7 @@ public class UserServiceTest {
         existingUser.setId(2L);
         existingUser.setUsername("existinguser");
 
-        UserDTO updateDTO = new UserDTO();
+        UserRequestDTO updateDTO = new UserRequestDTO();
         updateDTO.setUsername("existinguser");
         updateDTO.setPassword("newpassword");
         updateDTO.setAdminPassword("password");

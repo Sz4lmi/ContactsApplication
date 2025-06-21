@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService, UserDTO } from '../../services/user.service';
+import { UserService } from '../../services/user.service';
+import { UserrequestDTO } from '../../models/userrequestDTO';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -44,7 +45,7 @@ export class NewuserformComponent {
     this.successMessage = '';
     this.validationErrors = {};
 
-    const userData: UserDTO = {
+    const userData: UserrequestDTO = {
       username: this.userForm.value.username,
       password: this.userForm.value.password,
       role: this.userForm.value.role

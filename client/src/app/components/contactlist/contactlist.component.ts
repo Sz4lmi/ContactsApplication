@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { ContactService } from '../../services/contact.service';
-import { ContactList } from '../../models/contactlist';
-import { Contactrequest, Address as AddressRequest } from '../../models/contactrequest';
+import { ContactlistDTO } from '../../models/contactlistDTO';
+import { ContactrequestDTO, Address as AddressRequest } from '../../models/contactrequestDTO';
 import { AuthService } from '../../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -13,10 +13,10 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./contactlist.component.css']
 })
 export class ContactlistComponent implements OnInit {
-  contacts: ContactList[] = [];
+  contacts: ContactlistDTO[] = [];
   showEditModal = false;
   editContactForm!: FormGroup;
-  selectedContact: ContactList | null = null;
+  selectedContact: ContactlistDTO | null = null;
   expandedContactIds: Set<number> = new Set<number>();
   validationErrors: { [key: string]: string } = {};
 
@@ -89,7 +89,7 @@ export class ContactlistComponent implements OnInit {
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', Validators.email],
-      mothersName: ['', Validators.required],
+      motherName: ['', Validators.required],
       birthDate: ['', Validators.required],
       tajNumber: ['', Validators.required],
       taxId: ['', Validators.required],
@@ -131,7 +131,7 @@ export class ContactlistComponent implements OnInit {
     this.addresses.removeAt(index);
   }
 
-  openEditModal(contact: ContactList): void {
+  openEditModal(contact: ContactlistDTO): void {
     console.log('Opening edit modal for contact:', contact);
     this.selectedContact = contact;
 
@@ -141,7 +141,7 @@ export class ContactlistComponent implements OnInit {
     // Fetch the full contact details to populate the form
     this.contactService.getContactById(contact.id).subscribe(
       (fullContact) => {
-        console.log('Found full contact:', fullContact);
+        console.log('Full contact:', fullContact);
 
         if (fullContact) {
           // Reset form arrays
@@ -157,8 +157,8 @@ export class ContactlistComponent implements OnInit {
             firstName: fullContact.firstName,
             lastName: fullContact.lastName,
             email: fullContact.email,
-            mothersName: fullContact.motherName,
-            birthDate: fullContact.birthDate,
+            motherName: fullContact.motherName,
+            birthDate: fullContact.birthDate ? fullContact.birthDate.substring(0, 10) : '',
             tajNumber: fullContact.tajNumber,
             taxId: fullContact.taxId
           });
@@ -210,11 +210,11 @@ export class ContactlistComponent implements OnInit {
     if (this.editContactForm.valid && this.selectedContact) {
       const formValue = this.editContactForm.value;
 
-      const contactRequest: Contactrequest = {
+      const contactRequest: ContactrequestDTO = {
         firstName: formValue.firstName,
         lastName: formValue.lastName,
         email: formValue.email,
-        motherName: formValue.mothersName,
+        motherName: formValue.motherName,
         birthDate: formValue.birthDate,
         tajNumber: formValue.tajNumber,
         taxId: formValue.taxId,
@@ -248,7 +248,7 @@ export class ContactlistComponent implements OnInit {
     }
   }
 
-  deleteContact(contact: ContactList): void {
+  deleteContact(contact: ContactlistDTO): void {
     if (confirm(`Are you sure you want to delete ${contact.firstName} ${contact.lastName}?`)) {
       this.contactService.deleteContact(contact.id).subscribe(
         () => {
@@ -261,7 +261,7 @@ export class ContactlistComponent implements OnInit {
     }
   }
 
-  toggleContactExpansion(contact: ContactList, event: MouseEvent): void {
+  toggleContactExpansion(contact: ContactlistDTO, event: MouseEvent): void {
     // Prevent the click from triggering if it was on a button
     if (event.target instanceof HTMLButtonElement) {
       return;

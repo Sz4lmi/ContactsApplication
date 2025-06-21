@@ -2,7 +2,8 @@ package contacts.controller;
 
 import contacts.config.SecurityConstants;
 import contacts.domain.User;
-import contacts.dto.UserDTO;
+import contacts.dto.UserListDTO;
+import contacts.dto.UserRequestDTO;
 import contacts.repository.UserRepository;
 import contacts.service.UserService;
 import contacts.util.JwtUtils;
@@ -84,7 +85,7 @@ public class AuthController {
      * @return Created user
      */
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO, HttpServletRequest request) {
+    public ResponseEntity<?> createUser(@RequestBody UserRequestDTO userDTO, HttpServletRequest request) {
         // Check if the current user is an admin
         String role = getRoleFromToken(request);
         if (role == null || !role.equals("ROLE_ADMIN")) {
@@ -93,7 +94,7 @@ public class AuthController {
 
         try {
             User createdUser = userService.createUser(userDTO);
-            return ResponseEntity.ok(createdUser);
+            return ResponseEntity.ok(userService.convertToUserListDTO(createdUser));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -121,19 +122,19 @@ public class AuthController {
             return ResponseEntity.status(403).body("Only admins can view all users");
         }
 
-        List<User> users = userService.getAllUsers();
+        List<UserListDTO> users = userService.getAllUsersAsList();
         return ResponseEntity.ok(users);
     }
 
     /**
      * Update a user (admin only)
      * @param id User ID
-     * @param userDTO User data
+     * @param dto User data
      * @param request HTTP request
      * @return Updated user
      */
     @PutMapping("/users/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO, HttpServletRequest request) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO dto, HttpServletRequest request) {
         // Check if the current user is an admin
         String role = getRoleFromToken(request);
         if (role == null || !role.equals("ROLE_ADMIN")) {
@@ -143,8 +144,8 @@ public class AuthController {
         try {
             // Get the admin's username from the token
             String adminUsername = JwtUtils.getUsernameFromToken(request);
-            User updatedUser = userService.updateUser(id, userDTO, adminUsername);
-            return ResponseEntity.ok(updatedUser);
+            User updatedUser = userService.updateUser(id, dto, adminUsername);
+            return ResponseEntity.ok(userService.convertToUserListDTO(updatedUser));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

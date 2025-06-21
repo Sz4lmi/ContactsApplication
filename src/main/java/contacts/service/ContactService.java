@@ -101,7 +101,7 @@ public class ContactService {
 
         // Convert to DTOs
         List<ContactListDTO> dtos = contacts.stream()
-                .map(this::convertToContactListDTO)
+                .map(ContactService::convertToContactListDTO)
                 .collect(Collectors.toList());
 
         logger.debug("returning {} DTOs", dtos.size());
@@ -127,7 +127,7 @@ public class ContactService {
 
         // Convert to DTOs
         List<ContactListDTO> dtos = contacts.stream()
-                .map(this::convertToContactListDTO)
+                .map(ContactService::convertToContactListDTO)
                 .collect(Collectors.toList());
 
         logger.debug("returning {} DTOs", dtos.size());
@@ -140,12 +140,16 @@ public class ContactService {
      * @param contact The contact entity to convert
      * @return The converted DTO
      */
-    private ContactListDTO convertToContactListDTO(Contact contact) {
+    public static ContactListDTO convertToContactListDTO(Contact contact) {
         ContactListDTO dto = new ContactListDTO();
         dto.setId(contact.getId());
         dto.setFirstName(contact.getFirstName());
         dto.setLastName(contact.getLastName());
         dto.setEmail(contact.getEmail());
+        dto.setMotherName(contact.getMotherName());
+        dto.setBirthDate(contact.getBirthDate());
+        dto.setTajNumber(contact.getTajNumber());
+        dto.setTaxId(contact.getTaxId());
 
         // Convert phone numbers
         List<ContactListDTO.PhoneNumberDTO> phoneNumberDTOs = contact.getPhoneNumbers().stream()

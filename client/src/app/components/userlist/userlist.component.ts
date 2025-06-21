@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService, User, UserDTO } from '../../services/user.service';
+import { UserService} from '../../services/user.service';
 import { ContactService } from '../../services/contact.service';
 import { LoggingService } from '../../services/logging.service';
+import {UserlistDTO} from '../../models/userlistDTO';
+import {UserrequestDTO} from '../../models/userrequestDTO';
 
 @Component({
   selector: 'app-userlist',
@@ -11,10 +13,10 @@ import { LoggingService } from '../../services/logging.service';
   styleUrls: ['./userlist.component.css']
 })
 export class UserlistComponent implements OnInit {
-  users: User[] = [];
+  users: UserlistDTO[] = [];
   showEditModal = false;
   editUserForm!: FormGroup;
-  selectedUser: User | null = null;
+  selectedUser: UserlistDTO | null = null;
   expandedUserIds: Set<number> = new Set<number>();
   expandedContactIds: Set<number> = new Set<number>();
 
@@ -65,7 +67,7 @@ export class UserlistComponent implements OnInit {
   /**
    * Get the users for the current page
    */
-  getCurrentPageUsers(): User[] {
+  getCurrentPageUsers(): UserlistDTO[] {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     return this.users.slice(startIndex, endIndex);
@@ -109,7 +111,7 @@ export class UserlistComponent implements OnInit {
     });
   }
 
-  openEditModal(user: User): void {
+  openEditModal(user: UserlistDTO): void {
     this.selectedUser = user;
     this.editUserForm.patchValue({
       username: user.username,
@@ -134,10 +136,10 @@ export class UserlistComponent implements OnInit {
         return;
       }
 
-      const userDTO: UserDTO = {
+      const userDTO: UserrequestDTO = {
         username: formValue.username,
         password: formValue.newPassword || '',
-        adminPassword: formValue.oldPassword || ''
+        adminPassword: formValue.adminPassword || ''
       };
 
       this.userService.updateUser(this.selectedUser.id, userDTO).subscribe(
@@ -153,7 +155,7 @@ export class UserlistComponent implements OnInit {
     }
   }
 
-  deleteUser(user: User): void {
+  deleteUser(user: UserlistDTO): void {
     if (confirm(`Are you sure you want to delete user "${user.username}"? This will also delete all of their contacts, phone numbers, and addresses.`)) {
       this.userService.deleteUser(user.id).subscribe(
         () => {
@@ -167,7 +169,7 @@ export class UserlistComponent implements OnInit {
     }
   }
 
-  toggleUserExpansion(user: User, event: MouseEvent): void {
+  toggleUserExpansion(user: UserlistDTO, event: MouseEvent): void {
     // Prevent the click from triggering if it was on a button
     if (event.target instanceof HTMLButtonElement) {
       return;

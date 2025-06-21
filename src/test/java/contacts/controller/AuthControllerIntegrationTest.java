@@ -1,7 +1,8 @@
 package contacts.controller;
 
 import contacts.domain.User;
-import contacts.dto.UserDTO;
+import contacts.dto.UserListDTO;
+import contacts.dto.UserRequestDTO;
 import contacts.repository.UserRepository;
 import contacts.service.UserService;
 import contacts.util.JwtUtils;
@@ -53,7 +54,7 @@ public class AuthControllerIntegrationTest {
 
     private User testUser;
     private User adminUser;
-    private UserDTO testUserDTO;
+    private UserRequestDTO testUserDTO;
     private String adminToken;
     private String userToken;
 
@@ -80,7 +81,7 @@ public class AuthControllerIntegrationTest {
         adminUser.setRole("ROLE_ADMIN");
 
         // Setup test user DTO
-        testUserDTO = new UserDTO();
+        testUserDTO = new UserRequestDTO();
         testUserDTO.setUsername("newuser");
         testUserDTO.setPassword("password");
         testUserDTO.setRole("ROLE_USER");
@@ -141,7 +142,8 @@ public class AuthControllerIntegrationTest {
     @Test
     void createUser_AsAdmin_ShouldCreateUser() throws Exception {
         // Arrange
-        when(userService.createUser(any(UserDTO.class))).thenReturn(testUser);
+        when(userService.createUser(any(UserRequestDTO.class))).thenReturn(testUser);
+        when(userService.convertToUserListDTO(any(User.class))).thenReturn(createUserListDTO(testUser));
 
         // Act & Assert
         try (MockedStatic<JwtUtils> jwtUtils = Mockito.mockStatic(JwtUtils.class)) {
@@ -175,7 +177,10 @@ public class AuthControllerIntegrationTest {
     @Test
     void getAllUsers_AsAdmin_ShouldReturnAllUsers() throws Exception {
         // Arrange
-        when(userService.getAllUsers()).thenReturn(Arrays.asList(testUser, adminUser));
+        when(userService.getAllUsersAsList()).thenReturn(Arrays.asList(
+            createUserListDTO(testUser), 
+            createUserListDTO(adminUser)
+        ));
 
         // Act & Assert
         try (MockedStatic<JwtUtils> jwtUtils = Mockito.mockStatic(JwtUtils.class)) {
@@ -206,7 +211,8 @@ public class AuthControllerIntegrationTest {
     @Test
     void updateUser_AsAdmin_ShouldUpdateUser() throws Exception {
         // Arrange
-        when(userService.updateUser(any(Long.class), any(UserDTO.class), anyString())).thenReturn(testUser);
+        when(userService.updateUser(any(Long.class), any(UserRequestDTO.class), anyString())).thenReturn(testUser);
+        when(userService.convertToUserListDTO(any(User.class))).thenReturn(createUserListDTO(testUser));
 
         // Act & Assert
         try (MockedStatic<JwtUtils> jwtUtils = Mockito.mockStatic(JwtUtils.class)) {
@@ -261,5 +267,16 @@ public class AuthControllerIntegrationTest {
                     .header("Authorization", userToken))
                     .andExpect(status().isForbidden());
         }
+    }
+
+    /**
+     * Helper method to create a UserListDTO from a User
+     */
+    private UserListDTO createUserListDTO(User user) {
+        UserListDTO dto = new UserListDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setRole(user.getRole());
+        return dto;
     }
 }

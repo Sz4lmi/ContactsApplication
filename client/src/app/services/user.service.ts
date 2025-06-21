@@ -2,20 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-export interface UserDTO {
-  username: string;
-  password: string;
-  adminPassword?: string;
-  role?: string;
-}
-
-export interface User {
-  id: number;
-  username: string;
-  role: string;
-  contacts: any[];
-}
+import {UserlistDTO} from '../models/userlistDTO';
+import {UserrequestDTO} from '../models/userrequestDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +17,8 @@ export class UserService {
    * Get all users (admin only)
    * @returns Observable of all users (excluding admins)
    */
-  getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+  getAllUsers(): Observable<UserlistDTO[]> {
+    return this.http.get<UserlistDTO[]>(`${this.apiUrl}/users`).pipe(
       map(users => users.filter(user => user.role !== 'ROLE_ADMIN'))
     );
   }
@@ -40,7 +28,7 @@ export class UserService {
    * @param user User data
    * @returns Observable of the created user
    */
-  createUser(user: UserDTO): Observable<any> {
+  createUser(user: UserrequestDTO): Observable<any> {
     return this.http.post(`${this.apiUrl}/users`, user);
   }
 
@@ -50,7 +38,7 @@ export class UserService {
    * @param user User data
    * @returns Observable of the updated user
    */
-  updateUser(id: number, user: UserDTO): Observable<any> {
+  updateUser(id: number, user: UserrequestDTO): Observable<any> {
     return this.http.put(`${this.apiUrl}/users/${id}`, user);
   }
 

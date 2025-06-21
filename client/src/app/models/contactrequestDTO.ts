@@ -1,4 +1,4 @@
-export interface Contactrequest {
+export interface ContactrequestDTO {
   firstName: string;
   lastName: string;
   email: string;

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Contactrequest } from '../models/contactrequest';
-import { ContactList } from '../models/contactlist';
+import { ContactrequestDTO } from '../models/contactrequestDTO';
+import { ContactlistDTO } from '../models/contactlistDTO';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -41,9 +41,9 @@ export class ContactService {
   }
 
   // Get contact list for the current user or all contacts for admin
-  getContactList(): Observable<ContactList[]> {
+  getContactList(): Observable<ContactlistDTO[]> {
     console.log('ContactService: getContactList - isAdmin =', this.authService.isAdmin());
-    return this.http.get<ContactList[]>(`${this.apiUrl}/list`).pipe(
+    return this.http.get<ContactlistDTO[]>(`${this.apiUrl}/list`).pipe(
       map(contacts => {
         console.log('ContactService: getContactList response =', contacts);
         console.log('ContactService: getContactList response length =', contacts.length);
@@ -53,14 +53,14 @@ export class ContactService {
   }
 
   // Create a new contact
-  createContact(contactRequest: Contactrequest): Observable<any> {
+  createContact(contactRequest: ContactrequestDTO): Observable<any> {
     // The backend should associate the contact with the current user
     // based on the JWT token in the Authorization header
     return this.http.post<any>(this.apiUrl, contactRequest);
   }
 
   // Update an existing contact
-  updateContact(id: number, contactRequest: Contactrequest): Observable<any> {
+  updateContact(id: number, contactRequest: ContactrequestDTO): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}`, contactRequest);
   }
 

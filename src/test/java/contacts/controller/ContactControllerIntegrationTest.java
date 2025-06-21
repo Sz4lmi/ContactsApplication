@@ -147,7 +147,7 @@ public class ContactControllerIntegrationTest {
     @Test
     void getAllContacts_ShouldReturnContacts() throws Exception {
         // Arrange
-        when(contactService.getContactsByUserId(any())).thenReturn(Arrays.asList(testContact));
+        when(contactService.getContactListByUserId(any())).thenReturn(testContactListDTOs);
 
         // Act & Assert
         try (MockedStatic<JwtUtils> jwtUtils = Mockito.mockStatic(JwtUtils.class)) {
@@ -157,9 +157,9 @@ public class ContactControllerIntegrationTest {
             mockMvc.perform(get("/api/contacts")
                     .header("Authorization", "Bearer token"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[0].id").value(testContact.getId()))
-                    .andExpect(jsonPath("$[0].firstName").value(testContact.getFirstName()))
-                    .andExpect(jsonPath("$[0].lastName").value(testContact.getLastName()));
+                    .andExpect(jsonPath("$[0].id").value(testContactListDTOs.get(0).getId()))
+                    .andExpect(jsonPath("$[0].firstName").value(testContactListDTOs.get(0).getFirstName()))
+                    .andExpect(jsonPath("$[0].lastName").value(testContactListDTOs.get(0).getLastName()));
         }
     }
 

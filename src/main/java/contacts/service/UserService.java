@@ -1,7 +1,8 @@
 package contacts.service;
 
 import contacts.domain.User;
-import contacts.dto.UserDTO;
+import contacts.dto.UserListDTO;
+import contacts.dto.UserRequestDTO;
 import contacts.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -50,10 +52,10 @@ public class UserService {
 
     /**
      * Create a new user
-     * @param userDTO User data transfer object
+     * @param userDTO User request data transfer object
      * @return Created user
      */
-    public User createUser(UserDTO userDTO) {
+    public User createUser(UserRequestDTO userDTO) {
         // Check if username already exists
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists");
@@ -76,11 +78,11 @@ public class UserService {
     /**
      * Update an existing user
      * @param id User ID
-     * @param userDTO User data transfer object
+     * @param userDTO User request data transfer object
      * @param adminUsername Username of the admin performing the update (null if not admin)
      * @return Updated user
      */
-    public User updateUser(Long id, UserDTO userDTO, String adminUsername) {
+    public User updateUser(Long id, UserRequestDTO userDTO, String adminUsername) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -141,5 +143,28 @@ public class UserService {
      */
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    // Add these methods to UserService
+    public UserListDTO convertToUserListDTO(User user) {
+        UserListDTO dto = new UserListDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setRole(user.getRole());
+
+        // Convert contacts to ContactListDTOs if needed
+        if (user.getContacts() != null) {
+            dto.setContacts(user.getContacts().stream()
+                    .map(ContactService::convertToContactListDTO)
+                    .collect(Collectors.toList()));
+        }
+
+        return dto;
+    }
+
+    public List<UserListDTO> getAllUsersAsList() {
+        return userRepository.findAll().stream()
+                .map(this::convertToUserListDTO)
+                .collect(Collectors.toList());
     }
 }
